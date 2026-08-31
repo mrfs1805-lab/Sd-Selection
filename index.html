@@ -597,38 +597,7 @@ WhatsApp
 
 </section>
 
-<section class="container my-3">
 
-<div class="control-bar p-3">
-
-<!-- QUICK SOCIAL LINKS BUTTONS -->
-<div class="row g-2 mb-3">
-
-<div class="col-6 col-md-3">
-<a href="https://chat.whatsapp.com/LnrV5NHq3ybD1OaOyFpuwK?s=cl&p=a&mlu=4" target="_blank" class="btn btn-success w-100 btn-sm fw-bold">
-<i class="fab fa-whatsapp me-1"></i> WhatsApp Group
-</a>
-</div>
-
-<div class="col-6 col-md-3">
-<a href="https://whatsapp.com/channel/0029VbC0sVOF1YlXbX4bxV17" target="_blank" class="btn btn-success w-100 btn-sm fw-bold">
-<i class="fab fa-whatsapp me-1"></i> WhatsApp Channel
-</a>
-</div>
-
-<div class="col-6 col-md-3">
-<a href="https://www.tiktok.com/@sd.selection.02?_r=1&_t=ZS-98URFZKq2R2" target="_blank" class="btn btn-dark w-100 btn-sm fw-bold">
-<i class="fab fa-tiktok me-1"></i> TikTok All Things
-</a>
-</div>
-
-<div class="col-6 col-md-3">
-<a href="https://www.tiktok.com/@sd.selection05?_r=1&_t=ZS-99LEOF3XvvR" target="_blank" class="btn btn-dark w-100 btn-sm fw-bold">
-<i class="fab fa-tiktok me-1"></i> TikTok Jewels
-</a>
-</div>
-
-</div>
 
 <!-- =========================================================
 FILTER
@@ -719,7 +688,38 @@ Out of Stock
 
 
 
+<section class="container my-3">
 
+<div class="control-bar p-3">
+
+<!-- QUICK SOCIAL LINKS BUTTONS -->
+<div class="row g-2 mb-3">
+
+<div class="col-6 col-md-3">
+<a href="https://chat.whatsapp.com/LnrV5NHq3ybD1OaOyFpuwK?s=cl&p=a&mlu=4" target="_blank" class="btn btn-success w-100 btn-sm fw-bold">
+<i class="fab fa-whatsapp me-1"></i> WhatsApp Group
+</a>
+</div>
+
+<div class="col-6 col-md-3">
+<a href="https://whatsapp.com/channel/0029VbC0sVOF1YlXbX4bxV17" target="_blank" class="btn btn-success w-100 btn-sm fw-bold">
+<i class="fab fa-whatsapp me-1"></i> WhatsApp Channel
+</a>
+</div>
+
+<div class="col-6 col-md-3">
+<a href="https://www.tiktok.com/@sd.selection.02?_r=1&_t=ZS-98URFZKq2R2" target="_blank" class="btn btn-dark w-100 btn-sm fw-bold">
+<i class="fab fa-tiktok me-1"></i> TikTok All Things
+</a>
+</div>
+
+<div class="col-6 col-md-3">
+<a href="https://www.tiktok.com/@sd.selection05?_r=1&_t=ZS-99LEOF3XvvR" target="_blank" class="btn btn-dark w-100 btn-sm fw-bold">
+<i class="fab fa-tiktok me-1"></i> TikTok Jewels
+</a>
+</div>
+
+</div>
 
 <!-- =========================================================
 PRODUCTS
@@ -1531,7 +1531,9 @@ onclick="shareProduct(
 
 '${escapeJs(p.name)}',
 
-'${escapeJs(p.price)}'
+'${escapeJs(p.price)}',
+
+'${escapeJs(image)}'
 
 )"
 
@@ -2550,39 +2552,85 @@ function orderWhatsApp(
 
 
 /* =========================================================
-SHARE PRODUCT
+SHARE PRODUCT WITH IMAGE AND CUSTOM DETAILS
 ========================================================= */
 
-function shareProduct(
+async function shareProduct(
   code,
   name,
-  price
+  price,
+  imageUrl
 ) {
 
   const shareText =
-    "Sd Selection - Product Details:\n\n" +
+    name + "\n" +
     "Things No: " + code + "\n" +
-    "Things: " + name + "\n" +
     "Price: Rs. " + price + "\n\n" +
-    "Check out this product on our website:";
+    "Sd Selection\n" +
+    "0704599366\n\n" +
+    "Check out this product on our website: https://mrfs1805-lab.github.io/Sd-Selection/";
+
+  let filesArray = [];
+
+  if (imageUrl) {
+
+    try {
+
+      const response = await fetch(imageUrl);
+
+      const blob = await response.blob();
+
+      const file = new File(
+        [blob],
+        code + ".jpg",
+        { type: blob.type || "image/jpeg" }
+      );
+
+      filesArray = [file];
+
+    } catch (error) {
+
+      console.warn("Image fetch error:", error);
+
+    }
+
+  }
+
 
   if (navigator.share) {
 
-    navigator.share({
+    const shareData = {
       title: name,
-      text: shareText,
-      url: window.location.href
-    }).catch(function(error) {
-      console.log("Sharing canceled:", error);
-    });
+      text: shareText
+    };
+
+
+    if (
+      filesArray.length > 0 &&
+      navigator.canShare &&
+      navigator.canShare({ files: filesArray })
+    ) {
+
+      shareData.files = filesArray;
+
+    }
+
+
+    try {
+
+      await navigator.share(shareData);
+
+    } catch (error) {
+
+      console.log("Sharing canceled or failed:", error);
+
+    }
 
   } else {
 
     const whatsappShareUrl =
       "https://api.whatsapp.com/send?text=" +
-      encodeURIComponent(
-        shareText + "\n" + window.location.href
-      );
+      encodeURIComponent(shareText);
 
     window.open(whatsappShareUrl, "_blank");
 
