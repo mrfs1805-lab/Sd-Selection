@@ -1,0 +1,2582 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Sd Selection</title>
+
+<meta name="theme-color"
+      content="#0d6efd">
+
+<link rel="manifest"
+      href="manifest.json">
+
+<meta name="mobile-web-app-capable"
+      content="yes">
+
+<meta name="apple-mobile-web-app-capable"
+      content="yes">
+
+<meta name="apple-mobile-web-app-status-bar-style"
+      content="default">
+
+<meta name="apple-mobile-web-app-title"
+      content="Sd Selection">
+
+<link rel="apple-touch-icon"
+      href="images/icon-192.png">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      rel="stylesheet">
+
+
+<style>
+
+body {
+  background:#f8fafc;
+}
+
+
+/* HERO */
+
+.hero {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(13,110,253,.90),
+      rgba(0,180,216,.90)
+    );
+
+  color:#fff;
+
+  padding:65px 20px;
+}
+
+
+/* NAVBAR */
+
+.navbar-logo {
+  height:40px;
+  width:40px;
+  border-radius:50%;
+  margin-right:10px;
+  object-fit:cover;
+}
+
+
+/* PRODUCT */
+
+.product-card {
+  border:none;
+  border-radius:18px;
+  overflow:hidden;
+
+  box-shadow:
+    0 8px 25px rgba(0,0,0,.07);
+
+  transition:
+    transform .15s ease,
+    box-shadow .15s ease;
+}
+
+.product-card:hover {
+  transform:translateY(-4px);
+
+  box-shadow:
+    0 12px 30px rgba(0,0,0,.12);
+}
+
+
+.product-img {
+  width:100%;
+  height:240px;
+
+  object-fit:cover;
+
+  display:block;
+
+  background:#f1f5f9;
+
+  cursor:pointer;
+}
+
+
+/* VIDEO */
+
+.product-video-thumb {
+  width:100%;
+  height:240px;
+
+  background:#111827;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  color:#fff;
+}
+
+
+/* FOOTER */
+
+.footer {
+  background:#111827;
+
+  color:#fff;
+
+  padding:40px 0;
+}
+
+
+/* WHATSAPP */
+
+.whatsapp-float {
+  position:fixed;
+
+  right:20px;
+  bottom:20px;
+
+  z-index:999;
+}
+
+
+/* BOTTOM BAR */
+
+.bottom-bar {
+  display:none;
+}
+
+
+/* FILTER */
+
+.control-bar {
+  background:#fff;
+
+  border-radius:12px;
+
+  box-shadow:
+    0 4px 15px rgba(0,0,0,.05);
+}
+
+
+/* FILE PREVIEW */
+
+.file-preview {
+  border:1px dashed #adb5bd;
+
+  border-radius:12px;
+
+  padding:10px;
+
+  background:#f8f9fa;
+
+  margin-top:8px;
+}
+
+.file-preview img,
+.file-preview video {
+  max-width:100%;
+
+  max-height:180px;
+
+  border-radius:10px;
+
+  object-fit:contain;
+}
+
+
+/* FIRST LOAD */
+
+#products {
+  min-height:100px;
+}
+
+
+/* CACHE NOTICE */
+
+#syncStatus {
+  font-size:12px;
+}
+
+
+/* MOBILE */
+
+@media(max-width:768px) {
+
+  .bottom-bar {
+    display:flex;
+
+    position:fixed;
+
+    bottom:0;
+
+    left:0;
+
+    width:100%;
+
+    z-index:999;
+  }
+
+  body {
+    padding-bottom:60px;
+  }
+
+  .whatsapp-float {
+    bottom:70px;
+  }
+
+  .product-img {
+    height:220px;
+  }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+NAVBAR
+========================================================= -->
+
+<nav class="navbar navbar-dark bg-dark sticky-top">
+
+<div class="container d-flex justify-content-between align-items-center">
+
+<a class="navbar-brand d-flex align-items-center"
+   href="#">
+
+<img src="https://i.postimg.cc/MZcHQcx1/IMG-20260831-WA0000.jpg"
+     class="navbar-logo"
+     alt="Logo"
+     onerror="this.style.display='none'">
+
+<span>Sd Selection</span>
+
+</a>
+
+
+<div class="d-flex gap-2">
+
+<button
+  class="btn btn-outline-light btn-sm"
+  id="adminAuthBtn"
+  onclick="toggleAdminLogin()">
+
+<i class="fas fa-lock me-1"></i>
+Admin
+
+</button>
+
+
+<a href="tel:0704599366"
+   class="btn btn-success btn-sm">
+
+<i class="fas fa-phone me-1"></i>
+Call
+
+</a>
+
+</div>
+
+</div>
+
+</nav>
+
+
+
+<!-- =========================================================
+ADMIN PANEL
+========================================================= -->
+
+<section id="adminPanel"
+         class="container mt-4 d-none">
+
+<div class="card border-primary shadow-sm">
+
+<div class="card-header bg-primary text-white">
+
+<div class="d-flex justify-content-between align-items-center">
+
+<h5 class="mb-0">
+
+<i class="fas fa-user-shield me-2"></i>
+
+Admin Dashboard
+
+</h5>
+
+
+<button
+  class="btn btn-sm btn-danger"
+  onclick="logoutAdmin()">
+
+Logout
+
+</button>
+
+</div>
+
+</div>
+
+
+<div class="card-body">
+
+
+<h6 id="formTitle"
+    class="fw-bold mb-3">
+
+Add New Things
+
+</h6>
+
+
+<form id="thingsForm"
+      onsubmit="handleFormSubmit(event)">
+
+
+<input type="hidden"
+       id="existingImage">
+
+<input type="hidden"
+       id="existingVideo">
+
+
+<div class="row g-3">
+
+
+<!-- CODE -->
+
+<div class="col-md-2">
+
+<label class="form-label fw-bold">
+Code No.
+</label>
+
+<input
+  type="text"
+  id="thingsCode"
+  class="form-control"
+  placeholder="Sd001"
+  required>
+
+</div>
+
+
+<!-- NAME -->
+
+<div class="col-md-4">
+
+<label class="form-label fw-bold">
+Things Name
+</label>
+
+<input
+  type="text"
+  id="thingsName"
+  class="form-control"
+  placeholder="Item Name"
+  required>
+
+</div>
+
+
+<!-- PRICE -->
+
+<div class="col-md-3">
+
+<label class="form-label fw-bold">
+Price
+</label>
+
+<input
+  type="number"
+  step="0.01"
+  id="thingsPrice"
+  class="form-control"
+  required>
+
+</div>
+
+
+<!-- STOCK -->
+
+<div class="col-md-3">
+
+<label class="form-label fw-bold">
+Stock
+</label>
+
+<select id="thingsStock"
+        class="form-select">
+
+<option value="true">
+In Stock
+</option>
+
+<option value="false">
+Out of Stock
+</option>
+
+</select>
+
+</div>
+
+
+<!-- IMAGE -->
+
+<div class="col-md-6">
+
+<label class="form-label fw-bold">
+
+<i class="fas fa-image text-primary me-1"></i>
+
+Product Image
+
+</label>
+
+
+<input
+  type="file"
+  id="thingsImageFile"
+  class="form-control"
+  accept="image/*"
+  onchange="previewSelectedImage(event)">
+
+
+<div id="imagePreviewBox"
+     class="file-preview text-center d-none">
+
+<small id="imageFileName"
+       class="text-muted d-block mb-2">
+
+Selected Image
+
+</small>
+
+<img id="imagePreview"
+     src=""
+     alt="Image Preview">
+
+</div>
+
+</div>
+
+
+<!-- VIDEO -->
+
+<div class="col-md-6">
+
+<label class="form-label fw-bold">
+
+<i class="fas fa-video text-danger me-1"></i>
+
+Product Video
+
+</label>
+
+
+<input
+  type="file"
+  id="thingsVideoFile"
+  class="form-control"
+  accept="video/*"
+  onchange="previewSelectedVideo(event)">
+
+
+<div id="videoPreviewBox"
+     class="file-preview text-center d-none">
+
+<small id="videoFileName"
+       class="text-muted d-block mb-2">
+
+Selected Video
+
+</small>
+
+<video id="videoPreview"
+       controls>
+</video>
+
+</div>
+
+</div>
+
+
+<!-- BUTTONS -->
+
+<div class="col-12 text-end">
+
+<button
+  type="button"
+  id="cancelEditBtn"
+  class="btn btn-secondary d-none"
+  onclick="resetForm()">
+
+Cancel
+
+</button>
+
+
+<button
+  type="submit"
+  id="saveBtn"
+  class="btn btn-primary">
+
+<i class="fas fa-save me-1"></i>
+
+Save Things
+
+</button>
+
+</div>
+
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- =========================================================
+HERO
+========================================================= -->
+
+<section class="hero text-center">
+
+<h1 class="fw-bold display-5">
+Sd Selection
+</h1>
+
+<p class="lead fw-semibold">
+Delivery Available
+</p>
+
+
+<div class="d-flex justify-content-center gap-2">
+
+<a href="tel:0704599366"
+   class="btn btn-warning">
+
+<i class="fas fa-phone me-1"></i>
+
+Call Now
+
+</a>
+
+
+<a href="https://wa.me/94704599366"
+   class="btn btn-success">
+
+<i class="fab fa-whatsapp me-1"></i>
+
+WhatsApp
+
+</a>
+
+</div>
+
+</section>
+
+
+
+<!-- =========================================================
+FILTER
+========================================================= -->
+
+<section class="container my-3">
+
+<div class="control-bar p-3">
+
+<div class="row g-3">
+
+
+<div class="col-md-4">
+
+<label class="form-label fw-bold">
+Search Things
+</label>
+
+<input
+  id="searchInput"
+  class="form-control"
+  placeholder="Search by name or code">
+
+</div>
+
+
+<div class="col-md-4">
+
+<label class="form-label fw-bold">
+Sort By
+</label>
+
+<select id="sortBy"
+        class="form-select">
+
+<option value="code">
+Things No.
+</option>
+
+<option value="price-asc">
+Price Low → High
+</option>
+
+<option value="price-desc">
+Price High → Low
+</option>
+
+<option value="name">
+Name A → Z
+</option>
+
+</select>
+
+</div>
+
+
+<div class="col-md-4">
+
+<label class="form-label fw-bold">
+Stock
+</label>
+
+<select id="filterStock"
+        class="form-select">
+
+<option value="all">
+All Things
+</option>
+
+<option value="in-stock">
+In Stock
+</option>
+
+<option value="out-of-stock">
+Out of Stock
+</option>
+
+</select>
+
+</div>
+
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<section class="container my-3">
+
+<div class="control-bar p-3">
+
+<!-- QUICK SOCIAL LINKS BUTTONS -->
+<div class="row g-2 mb-3">
+
+<div class="col-6 col-md-3">
+<a href="https://chat.whatsapp.com/LnrV5NHq3ybD1OaOyFpuwK?s=cl&p=a&mlu=4" target="_blank" class="btn btn-success w-100 btn-sm fw-bold">
+<i class="fab fa-whatsapp me-1"></i> WhatsApp Group
+</a>
+</div>
+
+<div class="col-6 col-md-3">
+<a href="https://whatsapp.com/channel/0029VbC0sVOF1YlXbX4bxV17" target="_blank" class="btn btn-success w-100 btn-sm fw-bold">
+<i class="fab fa-whatsapp me-1"></i> WhatsApp Channel
+</a>
+</div>
+
+<div class="col-6 col-md-3">
+<a href="https://www.tiktok.com/@sd.selection.02?_r=1&_t=ZS-98URFZKq2R2" target="_blank" class="btn btn-dark w-100 btn-sm fw-bold">
+<i class="fab fa-tiktok me-1"></i> TikTok All Things
+</a>
+</div>
+
+<div class="col-6 col-md-3">
+<a href="https://www.tiktok.com/@sd.selection05?_r=1&_t=ZS-99LEOF3XvvR" target="_blank" class="btn btn-dark w-100 btn-sm fw-bold">
+<i class="fab fa-tiktok me-1"></i> TikTok Jewels
+</a>
+</div>
+
+</div>
+
+<!-- =========================================================
+PRODUCTS
+========================================================= -->
+
+<section class="container pb-5">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+<h2 class="text-center fw-bold mb-0">
+Available Things
+</h2>
+
+<span id="syncStatus"
+      class="text-muted">
+
+</span>
+
+</div>
+
+
+<!-- NO LOADING SCREEN -->
+
+<div id="products"
+     class="row g-4">
+
+</div>
+
+
+<div id="noResults"
+     class="text-center py-5 d-none">
+
+<i class="fas fa-box fa-3x text-muted mb-3"></i>
+
+<h4>
+No things found
+</h4>
+
+</div>
+
+</section>
+
+
+
+<!-- =========================================================
+FOOTER
+========================================================= -->
+
+<footer class="footer text-center">
+
+<h3>
+Sd Selection
+</h3>
+
+<p>
+0704599366
+</p>
+
+<p>
+G.s Road Kirankulam-07, Batticaloa
+</p>
+
+</footer>
+
+
+
+<!-- =========================================================
+IMAGE MODAL
+========================================================= -->
+
+<div class="modal fade"
+     id="imageModal">
+
+<div class="modal-dialog modal-lg modal-dialog-centered">
+
+<div class="modal-content">
+
+<img id="modalImage"
+     class="img-fluid rounded"
+     alt="Product Image">
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- =========================================================
+VIDEO MODAL
+========================================================= -->
+
+<div class="modal fade"
+     id="videoModal">
+
+<div class="modal-dialog modal-lg modal-dialog-centered">
+
+<div class="modal-content bg-dark">
+
+<div class="modal-header text-white">
+
+<h5 id="videoTitle"
+    class="modal-title">
+
+Video
+
+</h5>
+
+<button
+  type="button"
+  class="btn-close btn-close-white"
+  data-bs-dismiss="modal"
+  onclick="stopVideo()">
+
+</button>
+
+</div>
+
+
+<div class="modal-body p-0">
+
+<video id="modalVideo"
+       controls
+       playsinline
+       class="w-100"
+       style="max-height:75vh;">
+
+</video>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- =========================================================
+WHATSAPP FLOAT
+========================================================= -->
+
+
+
+
+<!-- =========================================================
+BOTTOM BAR
+========================================================= -->
+
+<div class="bottom-bar">
+
+<a href="tel:0704599366"
+   class="btn btn-warning flex-fill rounded-0">
+
+Call
+
+</a>
+
+
+<a href="https://wa.me/94704599366"
+   class="btn btn-success flex-fill rounded-0">
+
+WhatsApp
+
+</a>
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+
+
+<script>
+
+/* =========================================================
+GOOGLE APPS SCRIPT
+========================================================= */
+
+const APPS_SCRIPT_URL =
+"https://script.google.com/macros/s/AKfycbwOMLKc68EyixNQ7UIUR3tyaFl3xcZT5C2xeZIvnje3E1-3ltdet1kUa0KvEUjLn6Ug/exec";
+
+
+/* =========================================================
+CACHE
+========================================================= */
+
+const PRODUCT_CACHE_KEY =
+"SdSelection_PRODUCTS_CACHE";
+
+
+/* =========================================================
+VARIABLES
+========================================================= */
+
+let products = [];
+
+let isAdminLoggedIn = false;
+
+let isEditing = false;
+
+
+/* =========================================================
+ELEMENTS
+========================================================= */
+
+const productsContainer =
+document.getElementById("products");
+
+const searchInput =
+document.getElementById("searchInput");
+
+const sortBy =
+document.getElementById("sortBy");
+
+const filterStock =
+document.getElementById("filterStock");
+
+const noResults =
+document.getElementById("noResults");
+
+const syncStatus =
+document.getElementById("syncStatus");
+
+
+/* =========================================================
+ESCAPE HTML
+========================================================= */
+
+function escapeHtml(value) {
+
+  return String(value ?? "")
+
+    .replace(/&/g,"&amp;")
+
+    .replace(/</g,"&lt;")
+
+    .replace(/>/g,"&gt;")
+
+    .replace(/"/g,"&quot;")
+
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================================================
+ESCAPE JS
+========================================================= */
+
+function escapeJs(value) {
+
+  return String(value ?? "")
+
+    .replace(/\\/g,"\\\\")
+
+    .replace(/'/g,"\\'")
+
+    .replace(/"/g,'\\"')
+
+    .replace(/\n/g,"\\n")
+
+    .replace(/\r/g,"\\r");
+
+}
+
+
+/* =========================================================
+LOAD CACHE FIRST
+========================================================= */
+
+function loadCachedProducts() {
+
+  try {
+
+    const cached =
+      localStorage.getItem(
+        PRODUCT_CACHE_KEY
+      );
+
+    if (!cached) return false;
+
+
+    const data =
+      JSON.parse(cached);
+
+
+    if (
+      Array.isArray(data) &&
+      data.length
+    ) {
+
+      products = data;
+
+      renderProducts();
+
+      return true;
+
+    }
+
+  } catch(error) {
+
+    console.warn(
+      "Cache error:",
+      error
+    );
+
+  }
+
+  return false;
+
+}
+
+
+/* =========================================================
+SAVE CACHE
+========================================================= */
+
+function saveProductCache(data) {
+
+  try {
+
+    localStorage.setItem(
+      PRODUCT_CACHE_KEY,
+      JSON.stringify(data)
+    );
+
+  } catch(error) {
+
+    console.warn(
+      "Unable to save cache:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+GET PRODUCTS
+========================================================= */
+
+async function fetchProducts() {
+
+  try {
+
+    const response =
+      await fetch(
+        APPS_SCRIPT_URL +
+        "?action=get",
+        {
+          method:"GET",
+
+          cache:"no-store"
+        }
+      );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        "Server error: " +
+        response.status
+      );
+
+    }
+
+
+    const result =
+      await response.json();
+
+
+    if (
+      result.status !==
+      "success"
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Unable to load products"
+      );
+
+    }
+
+
+    products =
+      Array.isArray(result.data)
+      ? result.data
+      : [];
+
+
+    saveProductCache(products);
+
+
+    renderProducts();
+
+
+    syncStatus.textContent =
+      "";
+
+
+  } catch(error) {
+
+    console.error(error);
+
+
+    if (!products.length) {
+
+      noResults.classList.remove(
+        "d-none"
+      );
+
+      productsContainer.innerHTML = `
+
+        <div class="col-12 text-center py-5">
+
+          <i class="fas fa-wifi fa-3x text-muted mb-3"></i>
+
+          <h5>
+          Unable to load products
+          </h5>
+
+          <p class="text-muted">
+          Please check your internet connection.
+          </p>
+
+          <button
+            class="btn btn-primary"
+            onclick="fetchProducts()">
+
+            <i class="fas fa-refresh me-1"></i>
+            Retry
+
+          </button>
+
+        </div>
+
+      `;
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+RENDER
+========================================================= */
+
+function renderProducts() {
+
+  let filtered =
+    products.filter(function(p) {
+
+      const search =
+        searchInput.value
+          .toLowerCase()
+          .trim();
+
+
+      const name =
+        String(
+          p.name || ""
+        ).toLowerCase();
+
+
+      const code =
+        String(
+          p.code || ""
+        ).toLowerCase();
+
+
+      const searchMatch =
+        name.includes(search) ||
+        code.includes(search);
+
+
+      let stockMatch = true;
+
+
+      if (
+        filterStock.value ===
+        "in-stock"
+      ) {
+
+        stockMatch =
+          p.stock === true;
+
+      }
+
+
+      if (
+        filterStock.value ===
+        "out-of-stock"
+      ) {
+
+        stockMatch =
+          p.stock === false;
+
+      }
+
+
+      return (
+        searchMatch &&
+        stockMatch
+      );
+
+    });
+
+
+  filtered.sort(function(a,b) {
+
+    switch(sortBy.value) {
+
+      case "price-asc":
+
+        return (
+          Number(a.price) -
+          Number(b.price)
+        );
+
+
+      case "price-desc":
+
+        return (
+          Number(b.price) -
+          Number(a.price)
+        );
+
+
+      case "name":
+
+        return String(a.name)
+          .localeCompare(
+            String(b.name)
+          );
+
+
+      default:
+
+        return (
+          Number(a.code) -
+          Number(b.code)
+        );
+
+    }
+
+  });
+
+
+  if (!filtered.length) {
+
+    productsContainer.innerHTML = "";
+
+    noResults.classList.remove(
+      "d-none"
+    );
+
+    return;
+
+  }
+
+
+  noResults.classList.add(
+    "d-none"
+  );
+
+
+  /*
+   * Build HTML only once.
+   */
+
+  productsContainer.innerHTML =
+    filtered.map(function(p) {
+
+      const image =
+        p.image ||
+        "https://via.placeholder.com/600x400?text=No+Image";
+
+
+      const safeImage =
+        escapeHtml(image);
+
+
+      const safeName =
+        escapeHtml(p.name);
+
+
+      const safeCode =
+        escapeHtml(p.code);
+
+
+      const safePrice =
+        Number(p.price || 0)
+          .toFixed(2);
+
+
+      return `
+
+<div class="col-12 col-sm-6 col-md-4">
+
+<div class="card product-card h-100">
+
+
+<img
+
+src="${safeImage}"
+
+class="product-img"
+
+alt="${safeName}"
+
+loading="eager"
+
+decoding="async"
+
+fetchpriority="high"
+
+onclick="showImage('${escapeJs(image)}')"
+
+onerror="imageError(this)">
+
+
+<div class="card-body d-flex flex-column">
+
+
+<div>
+
+<div class="d-flex justify-content-between mb-2">
+
+<span class="badge bg-dark">
+
+Things No:
+${safeCode}
+
+</span>
+
+
+<span class="badge ${
+  p.stock
+  ? "bg-success"
+  : "bg-danger"
+}">
+
+${
+  p.stock
+  ? "In Stock"
+  : "No Stock"
+}
+
+</span>
+
+</div>
+
+
+<h5 class="fw-bold">
+
+${safeName}
+
+</h5>
+
+
+<h4 class="text-primary fw-bold">
+
+Rs.
+${safePrice}
+
+<small class="text-muted">
+/ item
+</small>
+
+</h4>
+
+
+${
+p.video
+?
+
+`
+
+<button
+
+class="btn btn-outline-danger w-100 mt-2"
+
+onclick="playVideo(
+
+'${escapeJs(p.video)}',
+
+'${escapeJs(p.name)}'
+
+)">
+
+<i class="fas fa-play-circle me-1"></i>
+
+Watch Video
+
+</button>
+
+`
+
+:
+
+""
+
+}
+
+</div>
+
+
+<div class="mt-auto">
+
+
+${
+isAdminLoggedIn
+
+?
+
+`
+
+<div class="btn-group w-100 mt-3">
+
+<button
+
+class="btn btn-warning"
+
+onclick="editProduct(
+'${escapeJs(p.code)}'
+)">
+
+<i class="fas fa-edit"></i>
+
+Edit
+
+</button>
+
+
+<button
+
+class="btn btn-danger"
+
+onclick="deleteProduct(
+'${escapeJs(p.code)}',
+'${escapeJs(p.name)}'
+)">
+
+<i class="fas fa-trash"></i>
+
+Delete
+
+</button>
+
+</div>
+
+`
+
+:
+
+""
+
+}
+
+
+<button
+
+class="btn btn-success w-100 mt-2"
+
+${
+!p.stock
+? "disabled"
+: ""
+}
+
+onclick="orderWhatsApp(
+
+'${escapeJs(p.code)}',
+
+'${escapeJs(p.name)}',
+
+'${escapeJs(p.price)}'
+
+)">
+
+<i class="fab fa-whatsapp me-1"></i>
+
+${
+p.stock
+? "Order"
+: "Out of Stock"
+}
+
+</button>
+
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+    }).join("");
+
+
+}
+
+
+/* =========================================================
+IMAGE ERROR
+========================================================= */
+
+function imageError(img) {
+
+  if (
+    img.dataset.failed
+  ) {
+
+    return;
+
+  }
+
+
+  img.dataset.failed =
+    "true";
+
+
+  img.src =
+    "https://via.placeholder.com/600x400?text=Image+Not+Found";
+
+}
+
+
+/* =========================================================
+ADMIN LOGIN
+========================================================= */
+
+async function toggleAdminLogin() {
+
+  if (isAdminLoggedIn) {
+
+    document
+      .getElementById("adminPanel")
+      .classList.toggle("d-none");
+
+    return;
+
+  }
+
+
+  const username =
+    prompt(
+      "Enter Admin Username:"
+    );
+
+
+  if (!username) return;
+
+
+  const password =
+    prompt(
+      "Enter Admin Password:"
+    );
+
+
+  if (!password) return;
+
+
+  await verifyAdminSession(
+    username,
+    password
+  );
+
+}
+
+
+/* =========================================================
+VERIFY ADMIN
+========================================================= */
+
+async function verifyAdminSession(
+  username,
+  password
+) {
+
+  try {
+
+    const response =
+      await fetch(
+        APPS_SCRIPT_URL,
+        {
+
+          method:"POST",
+
+          body:
+            JSON.stringify({
+
+              action:
+                "checkLogin",
+
+              username:
+                username,
+
+              password:
+                password
+
+            })
+
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if (
+      result.status ===
+      "success"
+    ) {
+
+      setAdminState(true);
+
+
+      alert(
+        "Admin Login successful!"
+      );
+
+    } else {
+
+      alert(
+        result.message ||
+        "Invalid login"
+      );
+
+    }
+
+  } catch(error) {
+
+    alert(
+      "Login error:\n" +
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+ADMIN STATE
+========================================================= */
+
+function setAdminState(
+  loggedIn
+) {
+
+  isAdminLoggedIn =
+    loggedIn;
+
+
+  const panel =
+    document.getElementById(
+      "adminPanel"
+    );
+
+
+  const button =
+    document.getElementById(
+      "adminAuthBtn"
+    );
+
+
+  if (loggedIn) {
+
+    localStorage.setItem(
+      "Sd_admin_auth",
+      "true"
+    );
+
+
+    panel.classList.remove(
+      "d-none"
+    );
+
+
+    button.className =
+      "btn btn-warning btn-sm";
+
+
+    button.innerHTML =
+      '<i class="fas fa-user-cog me-1"></i> Dashboard';
+
+  } else {
+
+    localStorage.removeItem(
+      "Sd_admin_auth"
+    );
+
+
+    panel.classList.add(
+      "d-none"
+    );
+
+
+    button.className =
+      "btn btn-outline-light btn-sm";
+
+
+    button.innerHTML =
+      '<i class="fas fa-lock me-1"></i> Admin';
+
+  }
+
+
+  renderProducts();
+
+}
+
+
+/* =========================================================
+LOGOUT
+========================================================= */
+
+function logoutAdmin() {
+
+  setAdminState(false);
+
+  resetForm();
+
+}
+
+
+/* =========================================================
+FILE TO BASE64
+ONLY USED FOR UPLOAD
+NOT FOR DISPLAY
+========================================================= */
+
+function fileToBase64(file) {
+
+  return new Promise(
+    function(resolve,reject) {
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        function() {
+
+          resolve(
+            reader.result
+          );
+
+        };
+
+
+      reader.onerror =
+        reject;
+
+
+      reader.readAsDataURL(
+        file
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+IMAGE PREVIEW
+========================================================= */
+
+function previewSelectedImage(event) {
+
+  const file =
+    event.target.files[0];
+
+
+  if (!file) return;
+
+
+  const preview =
+    document.getElementById(
+      "imagePreview"
+    );
+
+
+  const box =
+    document.getElementById(
+      "imagePreviewBox"
+    );
+
+
+  document.getElementById(
+    "imageFileName"
+  ).textContent =
+    file.name;
+
+
+  preview.src =
+    URL.createObjectURL(
+      file
+    );
+
+
+  box.classList.remove(
+    "d-none"
+  );
+
+}
+
+
+/* =========================================================
+VIDEO PREVIEW
+========================================================= */
+
+function previewSelectedVideo(event) {
+
+  const file =
+    event.target.files[0];
+
+
+  if (!file) return;
+
+
+  const preview =
+    document.getElementById(
+      "videoPreview"
+    );
+
+
+  const box =
+    document.getElementById(
+      "videoPreviewBox"
+    );
+
+
+  document.getElementById(
+    "videoFileName"
+  ).textContent =
+    file.name;
+
+
+  preview.src =
+    URL.createObjectURL(
+      file
+    );
+
+
+  box.classList.remove(
+    "d-none"
+  );
+
+}
+
+
+/* =========================================================
+SAVE / UPDATE
+========================================================= */
+
+async function handleFormSubmit(event) {
+
+  event.preventDefault();
+
+
+  const saveBtn =
+    document.getElementById(
+      "saveBtn"
+    );
+
+
+  const oldText =
+    saveBtn.innerHTML;
+
+
+  saveBtn.disabled =
+    true;
+
+
+  saveBtn.innerHTML =
+    '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
+
+
+  try {
+
+    const imageFile =
+      document.getElementById(
+        "thingsImageFile"
+      ).files[0];
+
+
+    const videoFile =
+      document.getElementById(
+        "thingsVideoFile"
+      ).files[0];
+
+
+    let image =
+      document.getElementById(
+        "existingImage"
+      ).value || "";
+
+
+    let video =
+      document.getElementById(
+        "existingVideo"
+      ).value || "";
+
+
+    const payload = {
+
+      action:"save",
+
+      code:
+        document.getElementById(
+          "thingsCode"
+        ).value.trim(),
+
+      name:
+        document.getElementById(
+          "thingsName"
+        ).value.trim(),
+
+      price:
+        document.getElementById(
+          "thingsPrice"
+        ).value,
+
+      stock:
+        document.getElementById(
+          "thingsStock"
+        ).value === "true",
+
+      image:image,
+
+      video:video
+
+    };
+
+
+    /* IMAGE UPLOAD */
+
+    if (imageFile) {
+
+      payload.imageBase64 =
+        await fileToBase64(
+          imageFile
+        );
+
+
+      payload.imageName =
+        imageFile.name;
+
+
+      payload.imageMime =
+        imageFile.type;
+
+    }
+
+
+    /* VIDEO UPLOAD */
+
+    if (videoFile) {
+
+      payload.videoBase64 =
+        await fileToBase64(
+          videoFile
+        );
+
+
+      payload.videoName =
+        videoFile.name;
+
+
+      payload.videoMime =
+        videoFile.type;
+
+    }
+
+
+    const response =
+      await fetch(
+        APPS_SCRIPT_URL,
+        {
+
+          method:"POST",
+
+          body:
+            JSON.stringify(
+              payload
+            )
+
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if (
+      result.status !==
+      "success"
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Save failed"
+      );
+
+    }
+
+
+    alert(
+      isEditing
+      ? "Product updated successfully!"
+      : "Product saved successfully!"
+    );
+
+
+    resetForm();
+
+
+    /*
+     * Refresh immediately.
+     */
+
+    await fetchProducts();
+
+
+  } catch(error) {
+
+    console.error(error);
+
+
+    alert(
+      "Save error:\n\n" +
+      error.message
+    );
+
+  } finally {
+
+    saveBtn.disabled =
+      false;
+
+
+    saveBtn.innerHTML =
+      oldText;
+
+  }
+
+}
+
+
+/* =========================================================
+EDIT
+========================================================= */
+
+function editProduct(code) {
+
+  const product =
+    products.find(
+      function(p) {
+
+        return String(p.code) ===
+               String(code);
+
+      }
+    );
+
+
+  if (!product) return;
+
+
+  isEditing =
+    true;
+
+
+  document.getElementById(
+    "thingsCode"
+  ).value =
+    product.code;
+
+
+  document.getElementById(
+    "thingsName"
+  ).value =
+    product.name;
+
+
+  document.getElementById(
+    "thingsPrice"
+  ).value =
+    product.price;
+
+
+  document.getElementById(
+    "thingsStock"
+  ).value =
+    product.stock
+    ? "true"
+    : "false";
+
+
+  document.getElementById(
+    "existingImage"
+  ).value =
+    product.image || "";
+
+
+  document.getElementById(
+    "existingVideo"
+  ).value =
+    product.video || "";
+
+
+  document.getElementById(
+    "thingsImageFile"
+  ).value =
+    "";
+
+
+  document.getElementById(
+    "thingsVideoFile"
+  ).value =
+    "";
+
+
+  if (product.image) {
+
+    document.getElementById(
+      "imagePreview"
+    ).src =
+      product.image;
+
+
+    document.getElementById(
+      "imageFileName"
+    ).textContent =
+      "Current Image";
+
+
+    document.getElementById(
+      "imagePreviewBox"
+    ).classList.remove(
+      "d-none"
+    );
+
+  }
+
+
+  if (product.video) {
+
+    document.getElementById(
+      "videoPreview"
+    ).src =
+      product.video;
+
+
+    document.getElementById(
+      "videoFileName"
+    ).textContent =
+      "Current Video";
+
+
+    document.getElementById(
+      "videoPreviewBox"
+    ).classList.remove(
+      "d-none"
+    );
+
+  }
+
+
+  document.getElementById(
+    "formTitle"
+  ).textContent =
+    "Edit Things No: " +
+    product.code;
+
+
+  document.getElementById(
+    "saveBtn"
+  ).innerHTML =
+    '<i class="fas fa-save me-1"></i> Update Things';
+
+
+  document.getElementById(
+    "cancelEditBtn"
+  ).classList.remove(
+    "d-none"
+  );
+
+
+  document.getElementById(
+    "adminPanel"
+  ).scrollIntoView({
+    behavior:"smooth"
+  });
+
+}
+
+
+/* =========================================================
+DELETE
+========================================================= */
+
+async function deleteProduct(
+  code,
+  name
+) {
+
+  if (
+    !confirm(
+      'Delete "' +
+      name +
+      '"?'
+    )
+  ) return;
+
+
+  try {
+
+    const response =
+      await fetch(
+        APPS_SCRIPT_URL,
+        {
+
+          method:"POST",
+
+          body:
+            JSON.stringify({
+
+              action:"delete",
+
+              code:code
+
+            })
+
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if (
+      result.status !==
+      "success"
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Delete failed"
+      );
+
+    }
+
+
+    alert(
+      "Product deleted successfully!"
+    );
+
+
+    await fetchProducts();
+
+
+  } catch(error) {
+
+    alert(
+      "Delete error:\n" +
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+RESET FORM
+========================================================= */
+
+function resetForm() {
+
+  isEditing =
+    false;
+
+
+  document.getElementById(
+    "thingsForm"
+  ).reset();
+
+
+  document.getElementById(
+    "existingImage"
+  ).value =
+    "";
+
+
+  document.getElementById(
+    "existingVideo"
+  ).value =
+    "";
+
+
+  document.getElementById(
+    "imagePreviewBox"
+  ).classList.add(
+    "d-none"
+  );
+
+
+  document.getElementById(
+    "videoPreviewBox"
+  ).classList.add(
+    "d-none"
+  );
+
+
+  document.getElementById(
+    "imagePreview"
+  ).src =
+    "";
+
+
+  document.getElementById(
+    "videoPreview"
+  ).src =
+    "";
+
+
+  document.getElementById(
+    "formTitle"
+  ).textContent =
+    "Add New Things";
+
+
+  document.getElementById(
+    "saveBtn"
+  ).innerHTML =
+    '<i class="fas fa-save me-1"></i> Save Things';
+
+
+  document.getElementById(
+    "cancelEditBtn"
+  ).classList.add(
+    "d-none"
+  );
+
+}
+
+
+/* =========================================================
+IMAGE MODAL
+========================================================= */
+
+function showImage(src) {
+
+  if (!src) return;
+
+
+  document.getElementById(
+    "modalImage"
+  ).src =
+    src;
+
+
+  bootstrap.Modal
+    .getOrCreateInstance(
+      document.getElementById(
+        "imageModal"
+      )
+    )
+    .show();
+
+}
+
+
+/* =========================================================
+VIDEO
+========================================================= */
+
+function playVideo(
+  src,
+  title
+) {
+
+  if (!src) return;
+
+
+  const video =
+    document.getElementById(
+      "modalVideo"
+    );
+
+
+  document.getElementById(
+    "videoTitle"
+  ).textContent =
+    title;
+
+
+  video.src =
+    src;
+
+
+  bootstrap.Modal
+    .getOrCreateInstance(
+      document.getElementById(
+        "videoModal"
+      )
+    )
+    .show();
+
+
+  video.play()
+    .catch(function(){});
+
+}
+
+
+/* =========================================================
+STOP VIDEO
+========================================================= */
+
+function stopVideo() {
+
+  const video =
+    document.getElementById(
+      "modalVideo"
+    );
+
+
+  video.pause();
+
+  video.removeAttribute(
+    "src"
+  );
+
+  video.load();
+
+}
+
+
+/* =========================================================
+WHATSAPP
+========================================================= */
+
+function orderWhatsApp(
+  code,
+  name,
+  price
+) {
+
+  const message =
+    "Hello,\n\n" +
+
+    "Things No: " +
+    code +
+
+    "\n" +
+
+    "Things: " +
+    name +
+
+    "\n" +
+
+    "Price: Rs. " +
+    price +
+    " / item\n\n" +
+
+    "Please confirm availability.";
+
+
+  window.open(
+
+    "https://wa.me/94704599366?text=" +
+
+    encodeURIComponent(
+      message
+    ),
+
+    "_blank"
+
+  );
+
+}
+
+
+/* =========================================================
+FILTER EVENTS
+========================================================= */
+
+searchInput.addEventListener(
+  "input",
+  renderProducts
+);
+
+
+sortBy.addEventListener(
+  "change",
+  renderProducts
+);
+
+
+filterStock.addEventListener(
+  "change",
+  renderProducts
+);
+
+
+/* =========================================================
+ADMIN SESSION
+========================================================= */
+
+if (
+  localStorage.getItem(
+    "Sd_admin_auth"
+  ) === "true"
+) {
+
+  setAdminState(true);
+
+}
+
+
+/* =========================================================
+START
+========================================================= */
+
+/*
+ * VERY IMPORTANT:
+ *
+ * 1. Cache is loaded first.
+ * 2. Products render immediately.
+ * 3. Server is refreshed in background.
+ */
+
+loadCachedProducts();
+
+fetchProducts();
+
+</script>
+
+</body>
+
+</html>
