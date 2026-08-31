@@ -597,7 +597,38 @@ WhatsApp
 
 </section>
 
+<section class="container my-3">
 
+<div class="control-bar p-3">
+
+<!-- QUICK SOCIAL LINKS BUTTONS -->
+<div class="row g-2 mb-3">
+
+<div class="col-6 col-md-3">
+<a href="https://chat.whatsapp.com/LnrV5NHq3ybD1OaOyFpuwK?s=cl&p=a&mlu=4" target="_blank" class="btn btn-success w-100 btn-sm fw-bold">
+<i class="fab fa-whatsapp me-1"></i> WhatsApp Group
+</a>
+</div>
+
+<div class="col-6 col-md-3">
+<a href="https://whatsapp.com/channel/0029VbC0sVOF1YlXbX4bxV17" target="_blank" class="btn btn-success w-100 btn-sm fw-bold">
+<i class="fab fa-whatsapp me-1"></i> WhatsApp Channel
+</a>
+</div>
+
+<div class="col-6 col-md-3">
+<a href="https://www.tiktok.com/@sd.selection.02?_r=1&_t=ZS-98URFZKq2R2" target="_blank" class="btn btn-dark w-100 btn-sm fw-bold">
+<i class="fab fa-tiktok me-1"></i> TikTok All Things
+</a>
+</div>
+
+<div class="col-6 col-md-3">
+<a href="https://www.tiktok.com/@sd.selection05?_r=1&_t=ZS-99LEOF3XvvR" target="_blank" class="btn btn-dark w-100 btn-sm fw-bold">
+<i class="fab fa-tiktok me-1"></i> TikTok Jewels
+</a>
+</div>
+
+</div>
 
 <!-- =========================================================
 FILTER
@@ -688,38 +719,7 @@ Out of Stock
 
 
 
-<section class="container my-3">
 
-<div class="control-bar p-3">
-
-<!-- QUICK SOCIAL LINKS BUTTONS -->
-<div class="row g-2 mb-3">
-
-<div class="col-6 col-md-3">
-<a href="https://chat.whatsapp.com/LnrV5NHq3ybD1OaOyFpuwK?s=cl&p=a&mlu=4" target="_blank" class="btn btn-success w-100 btn-sm fw-bold">
-<i class="fab fa-whatsapp me-1"></i> WhatsApp Group
-</a>
-</div>
-
-<div class="col-6 col-md-3">
-<a href="https://whatsapp.com/channel/0029VbC0sVOF1YlXbX4bxV17" target="_blank" class="btn btn-success w-100 btn-sm fw-bold">
-<i class="fab fa-whatsapp me-1"></i> WhatsApp Channel
-</a>
-</div>
-
-<div class="col-6 col-md-3">
-<a href="https://www.tiktok.com/@sd.selection.02?_r=1&_t=ZS-98URFZKq2R2" target="_blank" class="btn btn-dark w-100 btn-sm fw-bold">
-<i class="fab fa-tiktok me-1"></i> TikTok All Things
-</a>
-</div>
-
-<div class="col-6 col-md-3">
-<a href="https://www.tiktok.com/@sd.selection05?_r=1&_t=ZS-99LEOF3XvvR" target="_blank" class="btn btn-dark w-100 btn-sm fw-bold">
-<i class="fab fa-tiktok me-1"></i> TikTok Jewels
-</a>
-</div>
-
-</div>
 
 <!-- =========================================================
 PRODUCTS
@@ -1488,9 +1488,11 @@ Delete
 }
 
 
+<div class="d-flex gap-2 mt-2">
+
 <button
 
-class="btn btn-success w-100 mt-2"
+class="btn btn-success flex-fill"
 
 ${
 !p.stock
@@ -1517,6 +1519,31 @@ p.stock
 }
 
 </button>
+
+
+<button
+
+class="btn btn-outline-primary"
+
+onclick="shareProduct(
+
+'${escapeJs(p.code)}',
+
+'${escapeJs(p.name)}',
+
+'${escapeJs(p.price)}'
+
+)"
+
+title="Share Product">
+
+<i class="fas fa-share-alt me-1"></i>
+
+Share
+
+</button>
+
+</div>
 
 
 </div>
@@ -2518,6 +2545,48 @@ function orderWhatsApp(
     "_blank"
 
   );
+
+}
+
+
+/* =========================================================
+SHARE PRODUCT
+========================================================= */
+
+function shareProduct(
+  code,
+  name,
+  price
+) {
+
+  const shareText =
+    "Sd Selection - Product Details:\n\n" +
+    "Things No: " + code + "\n" +
+    "Things: " + name + "\n" +
+    "Price: Rs. " + price + "\n\n" +
+    "Check out this product on our website:";
+
+  if (navigator.share) {
+
+    navigator.share({
+      title: name,
+      text: shareText,
+      url: window.location.href
+    }).catch(function(error) {
+      console.log("Sharing canceled:", error);
+    });
+
+  } else {
+
+    const whatsappShareUrl =
+      "https://api.whatsapp.com/send?text=" +
+      encodeURIComponent(
+        shareText + "\n" + window.location.href
+      );
+
+    window.open(whatsappShareUrl, "_blank");
+
+  }
 
 }
 
