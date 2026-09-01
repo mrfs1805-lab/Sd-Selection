@@ -112,7 +112,7 @@ body {
 /* HIGHLIGHT LINKED PRODUCT */
 
 .highlight-product {
-  animation: pulseHighlight 3s ease-in-out;
+  animation: pulseHighlight 3.5s ease-in-out;
   border-radius: 18px;
 }
 
@@ -262,9 +262,7 @@ body {
 <body>
 
 
-<!-- =========================================================
-NAVBAR
-========================================================= -->
+<!-- NAVBAR -->
 
 <nav class="navbar navbar-dark bg-dark sticky-top">
 
@@ -312,9 +310,7 @@ Call
 
 
 
-<!-- =========================================================
-ADMIN PANEL
-========================================================= -->
+<!-- ADMIN PANEL -->
 
 <section id="adminPanel"
          class="container mt-4 d-none">
@@ -571,9 +567,7 @@ Save Things
 
 
 
-<!-- =========================================================
-HERO
-========================================================= -->
+<!-- HERO -->
 
 <section class="hero text-center">
 
@@ -613,9 +607,7 @@ WhatsApp
 
 
 
-<!-- =========================================================
-FILTER
-========================================================= -->
+<!-- FILTER -->
 
 <section class="container my-3">
 
@@ -737,9 +729,7 @@ Out of Stock
 
 </section>
 
-<!-- =========================================================
-PRODUCTS
-========================================================= -->
+<!-- PRODUCTS -->
 
 <section class="container pb-5">
 
@@ -756,8 +746,6 @@ Available Things
 
 </div>
 
-
-<!-- NO LOADING SCREEN -->
 
 <div id="products"
      class="row g-4">
@@ -780,9 +768,7 @@ No things found
 
 
 
-<!-- =========================================================
-FOOTER
-========================================================= -->
+<!-- FOOTER -->
 
 <footer class="footer text-center">
 
@@ -802,9 +788,7 @@ G.s Road Kirankulam-07, Batticaloa
 
 
 
-<!-- =========================================================
-IMAGE MODAL
-========================================================= -->
+<!-- IMAGE MODAL -->
 
 <div class="modal fade"
      id="imageModal">
@@ -825,9 +809,7 @@ IMAGE MODAL
 
 
 
-<!-- =========================================================
-VIDEO MODAL
-========================================================= -->
+<!-- VIDEO MODAL -->
 
 <div class="modal fade"
      id="videoModal">
@@ -876,9 +858,7 @@ Video
 
 
 
-<!-- =========================================================
-BOTTOM BAR
-========================================================= -->
+<!-- BOTTOM BAR -->
 
 <div class="bottom-bar">
 
@@ -1201,7 +1181,7 @@ function renderProducts() {
 
       const pCode = String(p.code || "").trim().toLowerCase();
 
-      /* ALWAYS SHOW LINKED PRODUCT EVEN IF FILTERED */
+      /* ALWAYS SHOW LINKED PRODUCT EVEN IF FILTERED OUT */
       if (targetCodeFromUrl && pCode === targetCodeFromUrl) {
         return true;
       }
@@ -1319,10 +1299,6 @@ function renderProducts() {
     "d-none"
   );
 
-
-  /*
-   * Build HTML only once.
-   */
 
   productsContainer.innerHTML =
     filtered.map(function(p) {
@@ -1587,14 +1563,14 @@ Share
     }).join("");
 
 
-  /* CHECK URL AND SCROLL TO LINKED PRODUCT */
+  /* CHECK URL AND AUTO SCROLL TO PRODUCT */
   checkUrlAndScroll();
 
 }
 
 
 /* =========================================================
-CHECK URL AND SCROLL TO PRODUCT (WITH RETRY & CASE FLEXIBILITY)
+CHECK URL AND SCROLL TO PRODUCT (RETRY & CASE-INSENSITIVE)
 ========================================================= */
 
 function checkUrlAndScroll() {
@@ -1614,7 +1590,7 @@ function checkUrlAndScroll() {
   });
 
   if (!foundProduct) {
-    if (scrollAttempts < 10) {
+    if (scrollAttempts < 15) {
       scrollAttempts++;
       setTimeout(checkUrlAndScroll, 300);
     }
@@ -1641,9 +1617,9 @@ function checkUrlAndScroll() {
 
       }, 3500);
 
-    }, 400);
+    }, 300);
 
-  } else if (scrollAttempts < 10) {
+  } else if (scrollAttempts < 15) {
 
     scrollAttempts++;
 
@@ -1881,8 +1857,6 @@ function logoutAdmin() {
 
 /* =========================================================
 FILE TO BASE64
-ONLY USED FOR UPLOAD
-NOT FOR DISPLAY
 ========================================================= */
 
 function fileToBase64(file) {
@@ -2172,10 +2146,6 @@ async function handleFormSubmit(event) {
 
     resetForm();
 
-
-    /*
-     * Refresh immediately.
-     */
 
     await fetchProducts();
 
@@ -2772,14 +2742,6 @@ if (
 /* =========================================================
 START
 ========================================================= */
-
-/*
- * VERY IMPORTANT:
- *
- * 1. Cache is loaded first.
- * 2. Products render immediately.
- * 3. Server is refreshed in background.
- */
 
 loadCachedProducts();
 
