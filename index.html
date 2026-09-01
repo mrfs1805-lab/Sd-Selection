@@ -109,6 +109,19 @@ body {
 }
 
 
+/* HIGHLIGHT LINKED PRODUCT */
+
+.highlight-product {
+  animation: pulseHighlight 2.5s ease-in-out;
+}
+
+@keyframes pulseHighlight {
+  0% { outline: 4px solid #0d6efd; transform: scale(1.02); }
+  50% { outline: 4px solid #0d6efd; transform: scale(1.02); }
+  100% { outline: none; transform: scale(1); }
+}
+
+
 /* VIDEO */
 
 .product-video-thumb {
@@ -721,6 +734,8 @@ Out of Stock
 
 </div>
 
+</section>
+
 <!-- =========================================================
 PRODUCTS
 ========================================================= -->
@@ -861,13 +876,6 @@ Video
 
 
 <!-- =========================================================
-WHATSAPP FLOAT
-========================================================= -->
-
-
-
-
-<!-- =========================================================
 BOTTOM BAR
 ========================================================= -->
 
@@ -924,6 +932,8 @@ let products = [];
 let isAdminLoggedIn = false;
 
 let isEditing = false;
+
+let hasScrolledToUrlProduct = false;
 
 
 /* =========================================================
@@ -1325,7 +1335,7 @@ function renderProducts() {
 
       return `
 
-<div class="col-12 col-sm-6 col-md-4">
+<div class="col-12 col-sm-6 col-md-4" id="product-${safeCode}">
 
 <div class="card product-card h-100">
 
@@ -1560,6 +1570,50 @@ Share
 
     }).join("");
 
+
+  /* CHECK URL AND SCROLL TO LINKED PRODUCT */
+  checkUrlAndScroll();
+
+}
+
+
+/* =========================================================
+CHECK URL AND SCROLL TO PRODUCT
+========================================================= */
+
+function checkUrlAndScroll() {
+
+  if (hasScrolledToUrlProduct) return;
+
+  const urlParams = new URLSearchParams(window.location.search);
+
+  let codeParam = urlParams.get('code') || urlParams.get('item') || window.location.hash.replace('#', '');
+
+  if (!codeParam) return;
+
+  codeParam = decodeURIComponent(codeParam).trim();
+
+  const targetElement = document.getElementById("product-" + codeParam);
+
+  if (targetElement) {
+
+    hasScrolledToUrlProduct = true;
+
+    setTimeout(function() {
+
+      targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      targetElement.classList.add("highlight-product");
+
+      setTimeout(function() {
+
+        targetElement.classList.remove("highlight-product");
+
+      }, 2500);
+
+    }, 300);
+
+  }
 
 }
 
@@ -2552,7 +2606,7 @@ function orderWhatsApp(
 
 
 /* =========================================================
-SHARE PRODUCT WITH IMAGE AND CUSTOM DETAILS
+SHARE PRODUCT WITH IMAGE AND CUSTOM DIRECT PRODUCT LINK
 ========================================================= */
 
 async function shareProduct(
@@ -2562,13 +2616,16 @@ async function shareProduct(
   imageUrl
 ) {
 
+  const productUrl = "https://mrfs1805-lab.github.io/Sd-Selection/?code=" + encodeURIComponent(code);
+
   const shareText =
-    name + "\n" +
-    "Things No: " + code + "\n" +
-    "Price: Rs. " + price + "\n\n" +
-    "Sd Selection\n" +
-    "0704599366\n\n" +
-    "Check out this product on our website: https://mrfs1805-lab.github.io/Sd-Selection/";
+    "🛍️ *" + name + "*\n" +
+    "📌 Things No: " + code + "\n" +
+    "💰 Price: Rs. " + price + "\n\n" +
+  
+    "Sd Selection (0704599366)\n" +
+    "👇 Check out this product on our website:\n" +
+    productUrl;
 
   let filesArray = [];
 
