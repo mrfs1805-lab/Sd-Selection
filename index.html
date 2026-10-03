@@ -1,2755 +1,1112 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sd Selection</title>
-
-<meta name="theme-color"
-      content="#0d6efd">
-
-<link rel="manifest"
-      href="manifest.json">
-
-<meta name="mobile-web-app-capable"
-      content="yes">
-
-<meta name="apple-mobile-web-app-capable"
-      content="yes">
-
-<meta name="apple-mobile-web-app-status-bar-style"
-      content="default">
-
-<meta name="apple-mobile-web-app-title"
-      content="Sd Selection">
-
-<link rel="apple-touch-icon"
-      href="images/icon-192.png">
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet">
-
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-      rel="stylesheet">
-      <link rel="manifest" href="manifest.json">
- 
-<script>
-      
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
-</script>
-
-
+<meta name="theme-color" content="#0d6efd">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Sd Selection">
+<link rel="apple-touch-icon" href="images/icon-192.png">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
 <style>
-
-body {
-  background:#f8fafc;
+body{background:#f8fafc}
+.install-popup{position:fixed;left:50%;bottom:20px;transform:translate(-50%,140%);width:min(420px,calc(100% - 24px));background:#fff;border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.18);padding:16px;z-index:1050;display:flex;align-items:center;gap:14px;opacity:0;transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .35s ease;pointer-events:none}
+.install-popup.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.install-popup .install-icon{width:52px;height:52px;border-radius:14px;object-fit:cover;flex-shrink:0;box-shadow:0 4px 10px rgba(0,0,0,.12)}
+.install-popup .install-text{flex:1;min-width:0}
+.install-popup .install-text strong{font-size:.95rem;display:block}
+.install-popup .install-text span{font-size:.8rem;color:#6b7280;display:block;margin-top:1px}
+.install-popup .install-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.install-popup .btn-install{background:linear-gradient(135deg,#0d6efd,#00b4d8);color:#fff;border:none;font-weight:600;font-size:.85rem;padding:8px 16px;border-radius:10px;white-space:nowrap}
+.install-popup .btn-close-install{background:transparent;border:none;color:#9ca3af;font-size:1rem;padding:4px 6px;line-height:1}
+.install-popup .ios-instructions{font-size:.78rem;color:#6b7280;margin-top:6px;line-height:1.4}
+.install-popup .ios-instructions i{color:#0d6efd}
+.hero{background:linear-gradient(135deg,rgba(13,110,253,.90),rgba(0,180,216,.90));color:#fff;padding:65px 20px}
+#secretTap{user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;cursor:default}
+.navbar-logo{height:40px;width:40px;border-radius:50%;margin-right:10px;object-fit:cover}
+.product-card{border:none;border-radius:18px;overflow:hidden;box-shadow:0 8px 25px rgba(0,0,0,.07);transition:transform .15s ease,box-shadow .15s ease}
+.product-card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.12)}
+.product-img{width:100%;height:240px;object-fit:cover;display:block;background:#f1f5f9;cursor:pointer}
+.highlight-product{animation:pulseHighlight 3.5s ease-in-out;border-radius:18px}
+@keyframes pulseHighlight{0%{box-shadow:0 0 0 5px #0d6efd,0 8px 25px rgba(13,110,253,.5);transform:scale(1.03)}50%{box-shadow:0 0 0 5px #0d6efd,0 8px 25px rgba(13,110,253,.5);transform:scale(1.03)}100%{box-shadow:0 8px 25px rgba(0,0,0,.07);transform:scale(1)}}
+.product-video-thumb{width:100%;height:240px;background:#111827;display:flex;align-items:center;justify-content:center;color:#fff}
+.footer{background:#111827;color:#fff;padding:40px 0}
+.whatsapp-float{position:fixed;right:20px;bottom:20px;z-index:999}
+.bottom-bar{display:none}
+.control-bar{background:#fff;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.05)}
+.file-preview{border:1px dashed #adb5bd;border-radius:12px;padding:10px;background:#f8f9fa;margin-top:8px}
+.file-preview img,.file-preview video{max-width:100%;max-height:180px;border-radius:10px;object-fit:contain}
+#products{min-height:100px}
+.slot-box{position:relative;aspect-ratio:1;border:2px dashed #adb5bd;border-radius:12px;background:#f8f9fa;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.slot-box.filled{border-style:solid;border-color:#0d6efd}
+.slot-add{cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;color:#6b7280;margin:0}
+.slot-img{width:100%;height:100%;object-fit:cover}
+.slot-remove{position:absolute;top:4px;right:4px;width:26px;height:26px;border:none;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;line-height:1}
+.slot-tag{position:absolute;left:6px;bottom:6px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;padding:1px 7px;border-radius:8px}
+.photo-count{position:absolute;right:10px;bottom:10px;opacity:.9}
+.desc-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-line}
+.gallery-main{background:#f1f5f9;border-radius:12px;min-height:240px;display:flex;align-items:center;justify-content:center}
+.gallery-main img{max-width:100%;max-height:55vh;object-fit:contain;border-radius:12px}
+.g-thumb{width:64px;height:64px;flex:0 0 auto;border:2px solid transparent;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#f1f5f9;cursor:pointer}
+.g-thumb.active{border-color:#0d6efd}
+.g-thumb img{width:100%;height:100%;object-fit:cover}
+.cat-bar{display:flex;gap:8px;overflow-x:auto;padding:4px 2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.cat-bar::-webkit-scrollbar{display:none}
+.cat-chip{flex:0 0 auto;border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:20px;padding:6px 14px;font-size:.9rem;font-weight:600;white-space:nowrap}
+.cat-chip small{opacity:.7;margin-left:4px}
+.cat-chip.active{background:linear-gradient(135deg,#0d6efd,#00b4d8);border-color:transparent;color:#fff}
+#syncStatus{font-size:12px}
+@media(max-width:768px){
+.bottom-bar{display:flex;position:fixed;bottom:0;left:0;width:100%;z-index:999}
+body{padding-bottom:60px}
+.whatsapp-float{bottom:70px}
+.product-img{height:220px}
 }
-/* PWA INSTALL POPUP STYLES */
-.install-popup {
-  position: fixed;
-  left: 50%;
-  bottom: 20px;
-  transform: translate(-50%, 140%);
-  width: min(420px, calc(100% - 24px));
-  background: #ffffff;
-  border-radius: 18px;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.18);
-  padding: 16px;
-  z-index: 1050;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  opacity: 0;
-  transition: transform 0.35s cubic-bezier(.2,.8,.2,1), opacity 0.35s ease;
-  pointer-events: none;
-}
-
-.install-popup.show {
-  transform: translate(-50%, 0);
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.install-popup .install-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  object-fit: cover;
-  flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-}
-
-.install-popup .install-text {
-  flex: 1;
-  min-width: 0;
-}
-
-.install-popup .install-text strong {
-  font-size: 0.95rem;
-  display: block;
-}
-
-.install-popup .install-text span {
-  font-size: 0.8rem;
-  color: #6b7280;
-  display: block;
-  margin-top: 1px;
-}
-
-.install-popup .install-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.install-popup .btn-install {
-  background: linear-gradient(135deg, #0d6efd, #00b4d8);
-  color: #fff;
-  border: none;
-  font-weight: 600;
-  font-size: 0.85rem;
-  padding: 8px 16px;
-  border-radius: 10px;
-  white-space: nowrap;
-}
-
-.install-popup .btn-close-install {
-  background: transparent;
-  border: none;
-  color: #9ca3af;
-  font-size: 1rem;
-  padding: 4px 6px;
-  line-height: 1;
-}
-
-.install-popup .ios-instructions {
-  font-size: 0.78rem;
-  color: #6b7280;
-  margin-top: 6px;
-  line-height: 1.4;
-}
-
-.install-popup .ios-instructions i {
-  color: #0d6efd;
-}
-
-
-/* HERO */
-
-.hero {
-  background:
-    linear-gradient(
-      135deg,
-      rgba(13,110,253,.90),
-      rgba(0,180,216,.90)
-    );
-
-  color:#fff;
-
-  padding:65px 20px;
-}
-
-
-/* NAVBAR */
-
-.navbar-logo {
-  height:40px;
-  width:40px;
-  border-radius:50%;
-  margin-right:10px;
-  object-fit:cover;
-}
-
-
-/* PRODUCT */
-
-.product-card {
-  border:none;
-  border-radius:18px;
-  overflow:hidden;
-
-  box-shadow:
-    0 8px 25px rgba(0,0,0,.07);
-
-  transition:
-    transform .15s ease,
-    box-shadow .15s ease;
-}
-
-.product-card:hover {
-  transform:translateY(-4px);
-
-  box-shadow:
-    0 12px 30px rgba(0,0,0,.12);
-}
-
-
-.product-img {
-  width:100%;
-  height:240px;
-
-  object-fit:cover;
-
-  display:block;
-
-  background:#f1f5f9;
-
-  cursor:pointer;
-}
-
-
-/* HIGHLIGHT LINKED PRODUCT */
-
-.highlight-product {
-  animation: pulseHighlight 3.5s ease-in-out;
-  border-radius: 18px;
-}
-
-@keyframes pulseHighlight {
-  0% { box-shadow: 0 0 0 5px #0d6efd, 0 8px 25px rgba(13,110,253,0.5); transform: scale(1.03); }
-  50% { box-shadow: 0 0 0 5px #0d6efd, 0 8px 25px rgba(13,110,253,0.5); transform: scale(1.03); }
-  100% { box-shadow: 0 8px 25px rgba(0,0,0,.07); transform: scale(1); }
-}
-
-
-/* VIDEO */
-
-.product-video-thumb {
-  width:100%;
-  height:240px;
-
-  background:#111827;
-
-  display:flex;
-
-  align-items:center;
-  justify-content:center;
-
-  color:#fff;
-}
-
-
-/* FOOTER */
-
-.footer {
-  background:#111827;
-
-  color:#fff;
-
-  padding:40px 0;
-}
-
-
-/* WHATSAPP */
-
-.whatsapp-float {
-  position:fixed;
-
-  right:20px;
-  bottom:20px;
-
-  z-index:999;
-}
-
-
-/* BOTTOM BAR */
-
-.bottom-bar {
-  display:none;
-}
-
-
-/* FILTER */
-
-.control-bar {
-  background:#fff;
-
-  border-radius:12px;
-
-  box-shadow:
-    0 4px 15px rgba(0,0,0,.05);
-}
-
-
-/* FILE PREVIEW */
-
-.file-preview {
-  border:1px dashed #adb5bd;
-
-  border-radius:12px;
-
-  padding:10px;
-
-  background:#f8f9fa;
-
-  margin-top:8px;
-}
-
-.file-preview img,
-.file-preview video {
-  max-width:100%;
-
-  max-height:180px;
-
-  border-radius:10px;
-
-  object-fit:contain;
-}
-
-
-/* FIRST LOAD */
-
-#products {
-  min-height:100px;
-}
-
-
-/* CACHE NOTICE */
-
-#syncStatus {
-  font-size:12px;
-}
-
-
-/* MOBILE */
-
-@media(max-width:768px) {
-
-  .bottom-bar {
-    display:flex;
-
-    position:fixed;
-
-    bottom:0;
-
-    left:0;
-
-    width:100%;
-
-    z-index:999;
-  }
-
-  body {
-    padding-bottom:60px;
-  }
-
-  .whatsapp-float {
-    bottom:70px;
-  }
-
-  .product-img {
-    height:220px;
-  }
-
-}
-
 </style>
-
 </head>
-
-
 <body>
 
-
 <!-- NAVBAR -->
-
 <nav class="navbar navbar-dark bg-dark sticky-top">
-
 <div class="container d-flex justify-content-between align-items-center">
-
-<a class="navbar-brand d-flex align-items-center"
-   href="#">
-
-<img src="https://i.postimg.cc/MZcHQcx1/IMG-20260831-WA0000.jpg"
-     class="navbar-logo"
-     alt="Logo"
-     onerror="this.style.display='none'">
-
+<a class="navbar-brand d-flex align-items-center" href="#">
+<img src="https://i.postimg.cc/MZcHQcx1/IMG-20260831-WA0000.jpg" class="navbar-logo" alt="Logo" onerror="this.style.display='none'">
 <span>Sd Selection</span>
-
 </a>
-
-
 <div class="d-flex gap-2">
-
-<button
-  class="btn btn-outline-light btn-sm"
-  id="adminAuthBtn"
-  onclick="toggleAdminLogin()">
-
-<i class="fas fa-lock me-1"></i>
-Admin
-
+<!-- Admin button hidden: opens via 5 taps on the hero title -->
+<button class="btn btn-outline-light btn-sm d-none" id="adminAuthBtn" onclick="toggleAdminLogin()">
+<i class="fas fa-lock me-1"></i> Admin
 </button>
-
-
-<a href="tel:0704599366"
-   class="btn btn-success btn-sm">
-
-<i class="fas fa-phone me-1"></i>
-Call
-
-</a>
-
+<a href="tel:0704599366" class="btn btn-success btn-sm"><i class="fas fa-phone me-1"></i> Call</a>
 </div>
-
 </div>
-
 </nav>
 
-
-
 <!-- ADMIN PANEL -->
-
-<section id="adminPanel"
-         class="container mt-4 d-none">
-
+<section id="adminPanel" class="container mt-4 d-none">
 <div class="card border-primary shadow-sm">
-
 <div class="card-header bg-primary text-white">
-
 <div class="d-flex justify-content-between align-items-center">
-
-<h5 class="mb-0">
-
-<i class="fas fa-user-shield me-2"></i>
-
-Admin Dashboard
-
-</h5>
-
-
-<button
-  class="btn btn-sm btn-danger"
-  onclick="logoutAdmin()">
-
-Logout
-
-</button>
-
+<h5 class="mb-0"><i class="fas fa-user-shield me-2"></i> Admin Dashboard</h5>
+<button class="btn btn-sm btn-danger" onclick="logoutAdmin()">Logout</button>
 </div>
-
 </div>
-
-
 <div class="card-body">
+<div class="border rounded p-3 mb-4 bg-light">
+<h6 class="fw-bold"><i class="fas fa-tags text-success me-1"></i> Categories</h6>
+<div class="input-group mb-2">
+<input type="text" id="newCategoryName" class="form-control" maxlength="40" placeholder="New category name (e.g. Jewels)">
+<button type="button" class="btn btn-success" onclick="addCategory()"><i class="fas fa-plus me-1"></i> Add</button>
+</div>
+<div id="categoryManage" class="d-flex flex-wrap gap-2"></div>
+</div>
 
-
-<h6 id="formTitle"
-    class="fw-bold mb-3">
-
-Add New Things
-
-</h6>
-
-
-<form id="thingsForm"
-      onsubmit="handleFormSubmit(event)">
-
-
-<input type="hidden"
-       id="existingImage">
-
-<input type="hidden"
-       id="existingVideo">
-
-
+<h6 id="formTitle" class="fw-bold mb-3">Add New Things</h6>
+<form id="thingsForm" onsubmit="handleFormSubmit(event)">
+<input type="hidden" id="existingVideo">
 <div class="row g-3">
-
-
-<!-- CODE -->
-
-<div class="col-md-2">
-
-<label class="form-label fw-bold">
-Code No.
-</label>
-
-<input
-  type="text"
-  id="thingsCode"
-  class="form-control"
-  placeholder="Sd001"
-  required>
-
+<div class="col-md-2 d-none" id="codeCol">
+<label class="form-label fw-bold">Code No.</label>
+<input type="text" id="thingsCode" class="form-control bg-light fw-bold" readonly>
 </div>
-
-
-<!-- NAME -->
-
 <div class="col-md-4">
-
-<label class="form-label fw-bold">
-Things Name
-</label>
-
-<input
-  type="text"
-  id="thingsName"
-  class="form-control"
-  placeholder="Item Name"
-  required>
-
+<label class="form-label fw-bold">Things Name</label>
+<input type="text" id="thingsName" class="form-control" placeholder="Item Name" required>
 </div>
-
-
-<!-- PRICE -->
-
 <div class="col-md-3">
-
-<label class="form-label fw-bold">
-Price
-</label>
-
-<input
-  type="number"
-  step="0.01"
-  id="thingsPrice"
-  class="form-control"
-  required>
-
+<label class="form-label fw-bold">Selling Price</label>
+<input type="number" step="0.01" id="thingsPrice" class="form-control" required oninput="updateProfit()">
 </div>
-
-
-<!-- STOCK -->
-
 <div class="col-md-3">
-
-<label class="form-label fw-bold">
-Stock
-</label>
-
-<select id="thingsStock"
-        class="form-select">
-
-<option value="true">
-In Stock
-</option>
-
-<option value="false">
-Out of Stock
-</option>
-
+<label class="form-label fw-bold">Stock</label>
+<select id="thingsStock" class="form-select">
+<option value="true">In Stock</option>
+<option value="false">Out of Stock</option>
 </select>
-
 </div>
-
-
-<!-- IMAGE -->
-
 <div class="col-md-6">
-
-<label class="form-label fw-bold">
-
-<i class="fas fa-image text-primary me-1"></i>
-
-Product Image
-
-</label>
-
-
-<input
-  type="file"
-  id="thingsImageFile"
-  class="form-control"
-  accept="image/*"
-  onchange="previewSelectedImage(event)">
-
-
-<div id="imagePreviewBox"
-     class="file-preview text-center d-none">
-
-<small id="imageFileName"
-       class="text-muted d-block mb-2">
-
-Selected Image
-
-</small>
-
-<img id="imagePreview"
-     src=""
-     alt="Image Preview">
-
+<label class="form-label fw-bold"><i class="fas fa-lock text-danger me-1"></i> Admin Price (your cost - private)</label>
+<input type="number" step="0.01" min="0" id="thingsCost" class="form-control" placeholder="Price you buy at" oninput="updateProfit()">
+<small id="profitHint" class="text-muted"></small>
 </div>
-
-</div>
-
-
-<!-- VIDEO -->
-
 <div class="col-md-6">
-
-<label class="form-label fw-bold">
-
-<i class="fas fa-video text-danger me-1"></i>
-
-Product Video
-
-</label>
-
-
-<input
-  type="file"
-  id="thingsVideoFile"
-  class="form-control"
-  accept="video/*"
-  onchange="previewSelectedVideo(event)">
-
-
-<div id="videoPreviewBox"
-     class="file-preview text-center d-none">
-
-<small id="videoFileName"
-       class="text-muted d-block mb-2">
-
-Selected Video
-
-</small>
-
-<video id="videoPreview"
-       controls>
-</video>
-
+<label class="form-label fw-bold"><i class="fas fa-tags text-success me-1"></i> Category</label>
+<select id="thingsCategory" class="form-select">
+<option value="">— Select category —</option>
+</select>
 </div>
-
+<div class="col-12">
+<label class="form-label fw-bold"><i class="fas fa-align-left text-secondary me-1"></i> Description</label>
+<textarea id="thingsDescription" class="form-control" rows="3" maxlength="1000" placeholder="Size, colours, material, other details..."></textarea>
 </div>
-
-
-<!-- BUTTONS -->
-
+<div class="col-12">
+<label class="form-label fw-bold"><i class="fas fa-images text-primary me-1"></i> Product Images (max 5)</label>
+<div id="imageSlots" class="row g-2"></div>
+<small class="text-muted">First image is the main photo. Tap + to choose one or many photos.</small>
+</div>
+<div class="col-12">
+<label class="form-label fw-bold"><i class="fas fa-video text-danger me-1"></i> Product Video</label>
+<input type="file" id="thingsVideoFile" class="form-control" accept="video/*" onchange="previewSelectedVideo(event)">
+<div id="videoPreviewBox" class="file-preview text-center d-none">
+<small id="videoFileName" class="text-muted d-block mb-2">Selected Video</small>
+<video id="videoPreview" controls></video>
+</div>
+</div>
 <div class="col-12 text-end">
-
-<button
-  type="button"
-  id="cancelEditBtn"
-  class="btn btn-secondary d-none"
-  onclick="resetForm()">
-
-Cancel
-
-</button>
-
-
-<button
-  type="submit"
-  id="saveBtn"
-  class="btn btn-primary">
-
-<i class="fas fa-save me-1"></i>
-
-Save Things
-
-</button>
-
+<button type="button" id="cancelEditBtn" class="btn btn-secondary d-none" onclick="resetForm()">Cancel</button>
+<button type="submit" id="saveBtn" class="btn btn-primary"><i class="fas fa-save me-1"></i> Save Things</button>
 </div>
-
-
 </div>
-
 </form>
-
 </div>
-
 </div>
-
 </section>
-
-
 
 <!-- HERO -->
-
 <section class="hero text-center">
-
-<h1 class="fw-bold display-5">
-Sd Selection
-</h1>
-
-<p class="lead fw-semibold">
-Delivery Available
-</p>
-
-
+<h1 id="secretTap" class="fw-bold display-5">Sd Selection</h1>
+<p class="lead fw-semibold">Delivery Available</p>
 <div class="d-flex justify-content-center gap-2">
-
-<a href="tel:0704599366"
-   class="btn btn-warning">
-
-<i class="fas fa-phone me-1"></i>
-
-Call Now
-
-</a>
-
-
-<a href="https://wa.me/94704599366"
-   class="btn btn-success">
-
-<i class="fab fa-whatsapp me-1"></i>
-
-WhatsApp
-
-</a>
-
+<a href="tel:0704599366" class="btn btn-warning"><i class="fas fa-phone me-1"></i> Call Now</a>
+<a href="https://wa.me/94704599366" class="btn btn-success"><i class="fab fa-whatsapp me-1"></i> WhatsApp</a>
 </div>
-
 </section>
 
-
+<!-- CATEGORIES -->
+<section id="categorySection" class="container mt-3 d-none">
+<div id="categoryBar" class="cat-bar"></div>
+</section>
 
 <!-- FILTER -->
-
 <section class="container my-3">
-
 <div class="control-bar p-3">
-
 <div class="row g-3">
-
-
 <div class="col-md-4">
-
-<label class="form-label fw-bold">
-Search Things
-</label>
-
-<input
-  id="searchInput"
-  class="form-control"
-  placeholder="Search by name or code">
-
+<label class="form-label fw-bold">Search Things</label>
+<input id="searchInput" class="form-control" placeholder="Search by name or code">
 </div>
-
-
 <div class="col-md-4">
-
-<label class="form-label fw-bold">
-Sort By
-</label>
-
-<select id="sortBy"
-        class="form-select">
-
-<option value="code">
-Things No.
-</option>
-
-<option value="price-asc">
-Price Low → High
-</option>
-
-<option value="price-desc">
-Price High → Low
-</option>
-
-<option value="name">
-Name A → Z
-</option>
-
+<label class="form-label fw-bold">Sort By</label>
+<select id="sortBy" class="form-select">
+<option value="code">Things No.</option>
+<option value="price-asc">Price Low → High</option>
+<option value="price-desc">Price High → Low</option>
+<option value="name">Name A → Z</option>
 </select>
-
 </div>
-
-
 <div class="col-md-4">
-
-<label class="form-label fw-bold">
-Stock
-</label>
-
-<select id="filterStock"
-        class="form-select">
-
-<option value="all">
-All Things
-</option>
-
-<option value="in-stock">
-In Stock
-</option>
-
-<option value="out-of-stock">
-Out of Stock
-</option>
-
+<label class="form-label fw-bold">Stock</label>
+<select id="filterStock" class="form-select">
+<option value="all">All Things</option>
+<option value="in-stock">In Stock</option>
+<option value="out-of-stock">Out of Stock</option>
 </select>
-
 </div>
-
-
 </div>
-
 </div>
-
 </section>
 
-
-
 <section class="container my-3">
-
 <div class="control-bar p-3">
-
-<!-- QUICK SOCIAL LINKS BUTTONS -->
 <div class="row g-2 mb-3">
-
 <div class="col-6 col-md-3">
-<a href="https://chat.whatsapp.com/LnrV5NHq3ybD1OaOyFpuwK?s=cl&p=a&mlu=4" target="_blank" class="btn btn-success w-100 btn-sm fw-bold">
-<i class="fab fa-whatsapp me-1"></i> WhatsApp Group
-</a>
+<a href="https://chat.whatsapp.com/LnrV5NHq3ybD1OaOyFpuwK?s=cl&p=a&mlu=4" target="_blank" class="btn btn-success w-100 btn-sm fw-bold"><i class="fab fa-whatsapp me-1"></i> WhatsApp Group</a>
 </div>
-
 <div class="col-6 col-md-3">
-<a href="https://whatsapp.com/channel/0029VbC0sVOF1YlXbX4bxV17" target="_blank" class="btn btn-success w-100 btn-sm fw-bold">
-<i class="fab fa-whatsapp me-1"></i> WhatsApp Channel
-</a>
+<a href="https://whatsapp.com/channel/0029VbC0sVOF1YlXbX4bxV17" target="_blank" class="btn btn-success w-100 btn-sm fw-bold"><i class="fab fa-whatsapp me-1"></i> WhatsApp Channel</a>
 </div>
-
 <div class="col-6 col-md-3">
-<a href="https://www.tiktok.com/@sd.selection.02?_r=1&_t=ZS-98URFZKq2R2" target="_blank" class="btn btn-dark w-100 btn-sm fw-bold">
-<i class="fab fa-tiktok me-1"></i> TikTok All Things
-</a>
+<a href="https://www.tiktok.com/@sd.selection.02?_r=1&_t=ZS-98URFZKq2R2" target="_blank" class="btn btn-dark w-100 btn-sm fw-bold"><i class="fab fa-tiktok me-1"></i> TikTok All Things</a>
 </div>
-
 <div class="col-6 col-md-3">
-<a href="https://www.tiktok.com/@sd.selection05?_r=1&_t=ZS-99LEOF3XvvR" target="_blank" class="btn btn-dark w-100 btn-sm fw-bold">
-<i class="fab fa-tiktok me-1"></i> TikTok Jewels
-</a>
+<a href="https://www.tiktok.com/@sd.selection05?_r=1&_t=ZS-99LEOF3XvvR" target="_blank" class="btn btn-dark w-100 btn-sm fw-bold"><i class="fab fa-tiktok me-1"></i> TikTok Jewels</a>
 </div>
-
 </div>
-
+</div>
 </section>
 
 <!-- PRODUCTS -->
-
 <section class="container pb-5">
-
 <div class="d-flex justify-content-between align-items-center mb-4">
-
-<h2 class="text-center fw-bold mb-0">
-Available Things
-</h2>
-
-<span id="syncStatus"
-      class="text-muted">
-
-</span>
-
+<h2 class="text-center fw-bold mb-0">Available Things</h2>
+<span id="syncStatus" class="text-muted"></span>
 </div>
-
-
-<div id="products"
-     class="row g-4">
-
-</div>
-
-
-<div id="noResults"
-     class="text-center py-5 d-none">
-
+<div id="products" class="row g-4"></div>
+<div id="noResults" class="text-center py-5 d-none">
 <i class="fas fa-box fa-3x text-muted mb-3"></i>
-
-<h4>
-No things found
-</h4>
-
+<h4>No things found</h4>
 </div>
-
 </section>
 
-
-
 <!-- FOOTER -->
-
 <footer class="footer text-center">
-
-<h3>
-Sd Selection
-</h3>
-
-<p>
-0704599366
-</p>
-
-<p>
-G.s Road Kirankulam-07, Batticaloa
-</p>
-
+<h3>Sd Selection</h3>
+<p>0704599366</p>
+<p>G.s Road Kirankulam-07, Batticaloa</p>
 </footer>
 
-
-
-<!-- IMAGE MODAL -->
-
-<div class="modal fade"
-     id="imageModal">
-
-<div class="modal-dialog modal-lg modal-dialog-centered">
-
+<!-- DETAIL MODAL -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
 <div class="modal-content">
-
-<img id="modalImage"
-     class="img-fluid rounded"
-     alt="Product Image">
-
+<div class="modal-header py-2">
+<h5 class="modal-title" id="detailTitle"></h5>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 </div>
-
+<div class="modal-body">
+<div class="gallery-main">
+<img id="galleryMain" alt="Product Image" class="d-none">
+<i id="galleryLoading" class="fas fa-spinner fa-spin fa-2x text-muted"></i>
 </div>
-
+<div id="galleryThumbs" class="d-flex gap-2 mt-2 overflow-auto"></div>
+<div class="d-flex justify-content-between align-items-center mt-3">
+<span id="detailPrice" class="fs-4 fw-bold text-primary"></span>
+<span id="detailStock" class="badge"></span>
 </div>
-
-
+<p id="detailDesc" class="mt-2 mb-0" style="white-space:pre-line"></p>
+</div>
+</div>
+</div>
+</div>
 
 <!-- VIDEO MODAL -->
-
-<div class="modal fade"
-     id="videoModal">
-
+<div class="modal fade" id="videoModal">
 <div class="modal-dialog modal-lg modal-dialog-centered">
-
 <div class="modal-content bg-dark">
-
 <div class="modal-header text-white">
-
-<h5 id="videoTitle"
-    class="modal-title">
-
-Video
-
-</h5>
-
-<button
-  type="button"
-  class="btn-close btn-close-white"
-  data-bs-dismiss="modal"
-  onclick="stopVideo()">
-
-</button>
-
+<h5 id="videoTitle" class="modal-title">Video</h5>
+<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" onclick="stopVideo()"></button>
 </div>
-
-
 <div class="modal-body p-0">
-
-<video id="modalVideo"
-       controls
-       playsinline
-       class="w-100"
-       style="max-height:75vh;">
-
-</video>
-
+<video id="modalVideo" controls playsinline class="w-100" style="max-height:75vh;"></video>
 </div>
-
 </div>
-
 </div>
-
 </div>
-
-
 
 <!-- BOTTOM BAR -->
-
 <div class="bottom-bar">
-
-<a href="tel:0704599366"
-   class="btn btn-warning flex-fill rounded-0">
-
-Call
-
-</a>
-
-
-<a href="https://wa.me/94704599366"
-   class="btn btn-success flex-fill rounded-0">
-
-WhatsApp
-
-</a>
-
+<a href="tel:0704599366" class="btn btn-warning flex-fill rounded-0">Call</a>
+<a href="https://wa.me/94704599366" class="btn btn-success flex-fill rounded-0">WhatsApp</a>
 </div>
 
-
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- INSTALL APP POPUP -->
 <div id="installPopup" class="install-popup" role="dialog" aria-live="polite">
-  <img src="https://i.postimg.cc/MZcHQcx1/IMG-20260831-WA0000.jpg" alt="App icon" class="install-icon">
-  <div class="install-text">
-    <strong>Install Sd Selection</strong>
-    <span id="installSubtext">Add to your home screen for quick access</span>
-    <div id="iosInstructions" class="ios-instructions d-none">
-      Tap <i class="fas fa-share-nodes"></i> Share, then <strong>"Add to Home Screen"</strong>
-    </div>
-  </div>
-  <div class="install-actions">
-    <button class="btn-install" id="installActionBtn" onclick="handleInstallClick()">Install</button>
-    <button class="btn-close-install" onclick="dismissInstallPopup()" aria-label="Dismiss"><i class="fas fa-times"></i></button>
-  </div>
+<img src="https://i.postimg.cc/MZcHQcx1/IMG-20260831-WA0000.jpg" alt="App icon" class="install-icon">
+<div class="install-text">
+<strong>Install Sd Selection</strong>
+<span id="installSubtext">Add to your home screen for quick access</span>
+<div id="iosInstructions" class="ios-instructions d-none">Tap <i class="fas fa-share-nodes"></i> Share, then <strong>"Add to Home Screen"</strong></div>
 </div>
-
+<div class="install-actions">
+<button class="btn-install" id="installActionBtn" onclick="handleInstallClick()">Install</button>
+<button class="btn-close-install" onclick="dismissInstallPopup()" aria-label="Dismiss"><i class="fas fa-times"></i></button>
+</div>
+</div>
 
 <script>
-
-/* REGISTER SERVICE WORKER FOR PWA */
+/* SERVICE WORKER */
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
+  window.addEventListener('load', function () {
     navigator.serviceWorker.register('sw.js')
-      .then(function(reg) { console.log('Service Worker Registered Successfully!', reg); })
-      .catch(function(err) { console.error('Service Worker Registration Failed!', err); });
+      .then(function (reg) { console.log('Service Worker Registered Successfully!', reg); })
+      .catch(function (err) { console.error('Service Worker Registration Failed!', err); });
   });
 }
 
-/* =========================================================
-GOOGLE APPS SCRIPT
-========================================================= */
-
-const APPS_SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbwOMLKc68EyixNQ7UIUR3tyaFl3xcZT5C2xeZIvnje3E1-3ltdet1kUa0KvEUjLn6Ug/exec";
-
-
-/* =========================================================
-CACHE
-========================================================= */
-
-const PRODUCT_CACHE_KEY =
-"SdSelection_PRODUCTS_CACHE";
-
-
-/* =========================================================
-VARIABLES
-========================================================= */
+/* GOOGLE APPS SCRIPT */
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwOMLKc68EyixNQ7UIUR3tyaFl3xcZT5C2xeZIvnje3E1-3ltdet1kUa0KvEUjLn6Ug/exec";
+const PRODUCT_CACHE_KEY = "SdSelection_PRODUCTS_CACHE";
 
 let products = [];
-
 let isAdminLoggedIn = false;
-
 let isEditing = false;
-
 let hasScrolledToUrlProduct = false;
-
+let activeCategory = "all";
+let categoryList = [];
+let adminCosts = {};
+let serverCategories = [];
+let adminCategoryLabels = [];
+let editingCode = "";
+let isSaving = false;
 let scrollAttempts = 0;
 
-
-/* =========================================================
-ELEMENTS
-========================================================= */
-
-const productsContainer =
-document.getElementById("products");
-
-const searchInput =
-document.getElementById("searchInput");
-
-const sortBy =
-document.getElementById("sortBy");
-
-const filterStock =
-document.getElementById("filterStock");
-
-const noResults =
-document.getElementById("noResults");
-
-const syncStatus =
-document.getElementById("syncStatus");
-
-
-/* =========================================================
-ESCAPE HTML
-========================================================= */
+const productsContainer = document.getElementById("products");
+const searchInput = document.getElementById("searchInput");
+const sortBy = document.getElementById("sortBy");
+const filterStock = document.getElementById("filterStock");
+const noResults = document.getElementById("noResults");
+const syncStatus = document.getElementById("syncStatus");
 
 function escapeHtml(value) {
-
-  return String(value ?? "")
-
-    .replace(/&/g,"&amp;")
-
-    .replace(/</g,"&lt;")
-
-    .replace(/>/g,"&gt;")
-
-    .replace(/"/g,"&quot;")
-
-    .replace(/'/g,"&#039;");
-
+  return String(value ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
 }
-
-
-/* =========================================================
-ESCAPE JS
-========================================================= */
 
 function escapeJs(value) {
-
-  return String(value ?? "")
-
-    .replace(/\\/g,"\\\\")
-
-    .replace(/'/g,"\\'")
-
-    .replace(/"/g,'\\"')
-
-    .replace(/\n/g,"\\n")
-
-    .replace(/\r/g,"\\r");
-
+  return String(value ?? "").replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,"\\n").replace(/\r/g,"\\r");
 }
 
+/* CATEGORIES */
+function catKey(p) { return String(p.category || "").trim().toLowerCase() || "other"; }
+function catLabel(p) { return String(p.category || "").trim() || "Other"; }
 
-/* =========================================================
-LOAD CACHE FIRST
-========================================================= */
+function renderCategories() {
+  const map = {};
+  products.forEach(function (p) {
+    const k = catKey(p);
+    if (!map[k]) map[k] = { key: k, label: catLabel(p), count: 0 };
+    map[k].count++;
+  });
+  categoryList = Object.keys(map).map(function (k) { return map[k]; })
+    .sort(function (a, b) { return a.label.localeCompare(b.label); });
 
-function loadCachedProducts() {
+  if (activeCategory !== "all" && !map[activeCategory]) activeCategory = "all";
 
-  try {
-
-    const cached =
-      localStorage.getItem(
-        PRODUCT_CACHE_KEY
-      );
-
-    if (!cached) return false;
-
-
-    const data =
-      JSON.parse(cached);
-
-
-    if (
-      Array.isArray(data) &&
-      data.length
-    ) {
-
-      products = data;
-
-      renderProducts();
-
-      return true;
-
-    }
-
-  } catch(error) {
-
-    console.warn(
-      "Cache error:",
-      error
-    );
-
+  const section = document.getElementById("categorySection");
+  const bar = document.getElementById("categoryBar");
+  if (section && bar) {
+    section.classList.toggle("d-none", categoryList.length < 2);
+    bar.innerHTML =
+      '<button type="button" class="cat-chip ' + (activeCategory === "all" ? "active" : "") + '" onclick="setCategory(-1)">All<small>' + products.length + '</small></button>' +
+      categoryList.map(function (c, i) {
+        return '<button type="button" class="cat-chip ' + (activeCategory === c.key ? "active" : "") + '" onclick="setCategory(' + i + ')">' +
+          escapeHtml(c.label) + '<small>' + c.count + '</small></button>';
+      }).join("");
   }
 
-  return false;
-
+  renderCategoryAdmin();
 }
 
+function setCategory(i) {
+  activeCategory = i < 0 ? "all" : categoryList[i].key;
+  renderProducts();
+}
 
-/* =========================================================
-SAVE CACHE
-========================================================= */
+/* CATEGORY MANAGEMENT (saved in the "Categories" sheet) */
+function allCategoryLabels() {
+  const seen = {}, out = [];
+  serverCategories.concat(products.map(function (p) { return String(p.category || "").trim(); })).forEach(function (n) {
+    if (!n) return;
+    const k = n.toLowerCase();
+    if (!seen[k]) { seen[k] = 1; out.push(n); }
+  });
+  return out.sort(function (a, b) { return a.localeCompare(b); });
+}
+
+function setCategoryValue(v) {
+  const sel = document.getElementById("thingsCategory");
+  if (!sel) return;
+  const k = String(v || "").trim().toLowerCase();
+  let found = "";
+  Array.from(sel.options).forEach(function (o) { if (o.value && o.value.toLowerCase() === k) found = o.value; });
+  sel.value = found;
+}
+
+function renderCategoryAdmin() {
+  const sel = document.getElementById("thingsCategory");
+  const man = document.getElementById("categoryManage");
+  if (!sel) return;
+  const cur = sel.value;
+  adminCategoryLabels = allCategoryLabels();
+  sel.innerHTML = '<option value="">— Select category —</option>' +
+    adminCategoryLabels.map(function (n) { return '<option value="' + escapeHtml(n) + '">' + escapeHtml(n) + '</option>'; }).join("");
+  setCategoryValue(cur);
+  if (man) {
+    man.innerHTML = adminCategoryLabels.length
+      ? adminCategoryLabels.map(function (n, i) {
+          return '<span class="badge bg-white text-dark border fw-normal fs-6">' + escapeHtml(n) +
+            ' <button type="button" class="btn-close ms-1" style="font-size:.6rem" onclick="removeCategory(' + i + ')"></button></span>';
+        }).join("")
+      : '<small class="text-muted">No categories yet. Add one above.</small>';
+  }
+}
+
+async function adminPost(payload) {
+  payload.token = localStorage.getItem("Sd_admin_token") || "";
+  const r = await fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+  const j = await r.json();
+  if (j.code === "AUTH") { handleAuthExpired(); throw new Error(j.message || "Session expired"); }
+  if (j.status !== "success") throw new Error(j.message || "Request failed");
+  return j;
+}
+
+async function addCategory() {
+  const input = document.getElementById("newCategoryName");
+  const name = input.value.trim();
+  if (!name) return;
+  if (allCategoryLabels().some(function (n) { return n.toLowerCase() === name.toLowerCase(); })) {
+    alert("This category already exists.");
+    return;
+  }
+  try {
+    const j = await adminPost({ action: "addCategory", name: name });
+    serverCategories = j.categories || serverCategories;
+    input.value = "";
+    renderCategoryAdmin();
+    setCategoryValue(name);
+  } catch (e) {
+    alert("Could not add category:\n" + e.message);
+  }
+}
+
+async function removeCategory(i) {
+  const name = adminCategoryLabels[i];
+  if (!name) return;
+  const used = products.filter(function (p) { return String(p.category || "").trim().toLowerCase() === name.toLowerCase(); }).length;
+  if (used > 0) {
+    alert('"' + name + '" is used by ' + used + ' product(s). Change those products first.');
+    return;
+  }
+  if (!confirm('Delete category "' + name + '"?')) return;
+  try {
+    const j = await adminPost({ action: "deleteCategory", name: name });
+    serverCategories = j.categories || [];
+    renderCategoryAdmin();
+  } catch (e) {
+    alert("Could not delete category:\n" + e.message);
+  }
+}
+
+/* ADMIN PRICE (cost) - private, only loaded with the admin token */
+function updateProfit() {
+  const hint = document.getElementById("profitHint");
+  if (!hint) return;
+  const cost = parseFloat(document.getElementById("thingsCost").value);
+  const sell = parseFloat(document.getElementById("thingsPrice").value);
+  if (isNaN(cost) || isNaN(sell)) { hint.textContent = ""; hint.className = "text-muted"; return; }
+  const profit = sell - cost;
+  const pct = cost > 0 ? " (" + ((profit / cost) * 100).toFixed(1) + "%)" : "";
+  hint.textContent = "Profit: Rs. " + profit.toFixed(2) + pct;
+  hint.className = profit >= 0 ? "text-success fw-bold" : "text-danger fw-bold";
+}
+
+function costLine(p) {
+  const c = adminCosts[String(p.code)];
+  if (c === undefined || c === null || c === "") return "";
+  const profit = Number(p.price || 0) - Number(c);
+  return '<div class="small mt-2"><span class="badge bg-secondary">Cost Rs. ' + Number(c).toFixed(2) + '</span> ' +
+    '<span class="badge ' + (profit >= 0 ? "bg-success" : "bg-danger") + '">Profit Rs. ' + profit.toFixed(2) + '</span></div>';
+}
+
+async function loadAdminCosts() {
+  const token = localStorage.getItem("Sd_admin_token");
+  if (!token) { handleAuthExpired(); return; }
+  try {
+    const r = await fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "getCosts", token: token }) });
+    const j = await r.json();
+    if (j.code === "AUTH") { handleAuthExpired(); return; }
+    if (j.status === "success") { adminCosts = j.data || {}; renderProducts(); }
+  } catch (e) {
+    console.warn("Cost load error:", e);
+  }
+}
+
+function handleAuthExpired() {
+  if (isAdminLoggedIn) {
+    setAdminState(false);
+    alert("Admin session expired. Please login again.");
+  }
+}
+
+/* CACHE */
+function loadCachedProducts() {
+  try {
+    const cached = localStorage.getItem(PRODUCT_CACHE_KEY);
+    if (!cached) return false;
+    const data = JSON.parse(cached);
+    if (Array.isArray(data) && data.length) {
+      products = data;
+      renderProducts();
+      return true;
+    }
+  } catch (error) {
+    console.warn("Cache error:", error);
+  }
+  return false;
+}
 
 function saveProductCache(data) {
-
   try {
-
-    localStorage.setItem(
-      PRODUCT_CACHE_KEY,
-      JSON.stringify(data)
-    );
-
-  } catch(error) {
-
-    console.warn(
-      "Unable to save cache:",
-      error
-    );
-
+    localStorage.setItem(PRODUCT_CACHE_KEY, JSON.stringify(data));
+  } catch (error) {
+    console.warn("Unable to save cache:", error);
   }
-
 }
 
-
-/* =========================================================
-GET PRODUCTS
-========================================================= */
-
+/* GET PRODUCTS */
 async function fetchProducts() {
-
   try {
-
-    const response =
-      await fetch(
-        APPS_SCRIPT_URL +
-        "?action=get",
-        {
-          method:"GET",
-
-          cache:"no-store"
-        }
-      );
-
-
-    if (!response.ok) {
-
-      throw new Error(
-        "Server error: " +
-        response.status
-      );
-
-    }
-
-
-    const result =
-      await response.json();
-
-
-    if (
-      result.status !==
-      "success"
-    ) {
-
-      throw new Error(
-        result.message ||
-        "Unable to load products"
-      );
-
-    }
-
-
-    products =
-      Array.isArray(result.data)
-      ? result.data
-      : [];
-
-
+    const response = await fetch(APPS_SCRIPT_URL + "?action=get", { method: "GET", cache: "no-store" });
+    if (!response.ok) throw new Error("Server error: " + response.status);
+    const result = await response.json();
+    if (result.status !== "success") throw new Error(result.message || "Unable to load products");
+    products = Array.isArray(result.data) ? result.data : [];
+    serverCategories = Array.isArray(result.categories) ? result.categories : [];
     saveProductCache(products);
-
-
     renderProducts();
-
-
-    syncStatus.textContent =
-      "";
-
-
-  } catch(error) {
-
+    syncStatus.textContent = "";
+  } catch (error) {
     console.error(error);
-
-
     if (!products.length) {
-
-      noResults.classList.remove(
-        "d-none"
-      );
-
+      noResults.classList.remove("d-none");
       productsContainer.innerHTML = `
-
         <div class="col-12 text-center py-5">
-
           <i class="fas fa-wifi fa-3x text-muted mb-3"></i>
-
-          <h5>
-          Unable to load products
-          </h5>
-
-          <p class="text-muted">
-          Please check your internet connection.
-          </p>
-
-          <button
-            class="btn btn-primary"
-            onclick="fetchProducts()">
-
-            <i class="fas fa-refresh me-1"></i>
-            Retry
-
-          </button>
-
-        </div>
-
-      `;
-
+          <h5>Unable to load products</h5>
+          <p class="text-muted">Please check your internet connection.</p>
+          <button class="btn btn-primary" onclick="fetchProducts()"><i class="fas fa-refresh me-1"></i> Retry</button>
+        </div>`;
     }
-
   }
-
 }
 
-
-/* =========================================================
-RENDER
-========================================================= */
-
+/* RENDER */
 function renderProducts() {
-
+  renderCategories();
   const urlParams = new URLSearchParams(window.location.search);
   let targetCodeFromUrl = urlParams.get('code') || urlParams.get('item') || window.location.hash.replace('#', '');
-  if (targetCodeFromUrl) {
-    targetCodeFromUrl = decodeURIComponent(targetCodeFromUrl).trim().toLowerCase();
-  }
+  if (targetCodeFromUrl) targetCodeFromUrl = decodeURIComponent(targetCodeFromUrl).trim().toLowerCase();
 
-  let filtered =
-    products.filter(function(p) {
+  let filtered = products.filter(function (p) {
+    const pCode = String(p.code || "").trim().toLowerCase();
+    if (targetCodeFromUrl && pCode === targetCodeFromUrl) return true;
 
-      const pCode = String(p.code || "").trim().toLowerCase();
+    const search = searchInput.value.toLowerCase().trim();
+    const name = String(p.name || "").toLowerCase();
+    const code = String(p.code || "").toLowerCase();
+    const searchMatch = name.includes(search) || code.includes(search) || String(p.description || "").toLowerCase().includes(search);
 
-      /* ALWAYS SHOW LINKED PRODUCT EVEN IF FILTERED OUT */
-      if (targetCodeFromUrl && pCode === targetCodeFromUrl) {
-        return true;
-      }
+    let stockMatch = true;
+    if (filterStock.value === "in-stock") stockMatch = p.stock === true;
+    if (filterStock.value === "out-of-stock") stockMatch = p.stock === false;
 
-      const search =
-        searchInput.value
-          .toLowerCase()
-          .trim();
+    const catMatch = activeCategory === "all" || catKey(p) === activeCategory;
 
-
-      const name =
-        String(
-          p.name || ""
-        ).toLowerCase();
-
-
-      const code =
-        String(
-          p.code || ""
-        ).toLowerCase();
-
-
-      const searchMatch =
-        name.includes(search) ||
-        code.includes(search);
-
-
-      let stockMatch = true;
-
-
-      if (
-        filterStock.value ===
-        "in-stock"
-      ) {
-
-        stockMatch =
-          p.stock === true;
-
-      }
-
-
-      if (
-        filterStock.value ===
-        "out-of-stock"
-      ) {
-
-        stockMatch =
-          p.stock === false;
-
-      }
-
-
-      return (
-        searchMatch &&
-        stockMatch
-      );
-
-    });
-
-
-  filtered.sort(function(a,b) {
-
-    switch(sortBy.value) {
-
-      case "price-asc":
-
-        return (
-          Number(a.price) -
-          Number(b.price)
-        );
-
-
-      case "price-desc":
-
-        return (
-          Number(b.price) -
-          Number(a.price)
-        );
-
-
-      case "name":
-
-        return String(a.name)
-          .localeCompare(
-            String(b.name)
-          );
-
-
-      default:
-
-        return (
-          Number(a.code) -
-          Number(b.code)
-        );
-
-    }
-
+    return searchMatch && stockMatch && catMatch;
   });
 
+  filtered.sort(function (a, b) {
+    switch (sortBy.value) {
+      case "price-asc": return Number(a.price) - Number(b.price);
+      case "price-desc": return Number(b.price) - Number(a.price);
+      case "name": return String(a.name).localeCompare(String(b.name));
+      default: return String(a.code).localeCompare(String(b.code), undefined, { numeric: true, sensitivity: "base" });
+    }
+  });
 
   if (!filtered.length) {
-
     productsContainer.innerHTML = "";
-
-    noResults.classList.remove(
-      "d-none"
-    );
-
+    noResults.classList.remove("d-none");
     return;
-
   }
 
+  noResults.classList.add("d-none");
 
-  noResults.classList.add(
-    "d-none"
-  );
+  productsContainer.innerHTML = filtered.map(function (p) {
+    const image = p.image || "https://via.placeholder.com/600x400?text=No+Image";
+    const safeImage = escapeHtml(image);
+    const safeName = escapeHtml(p.name);
+    const safeCode = escapeHtml(p.code);
+    const safePrice = Number(p.price || 0).toFixed(2);
+    const photoCount = (p.imageUrls && p.imageUrls.length) || (p.image ? 1 : 0);
 
-
-  productsContainer.innerHTML =
-    filtered.map(function(p) {
-
-      const image =
-        p.image ||
-        "https://via.placeholder.com/600x400?text=No+Image";
-
-
-      const safeImage =
-        escapeHtml(image);
-
-
-      const safeName =
-        escapeHtml(p.name);
-
-
-      const safeCode =
-        escapeHtml(p.code);
-
-
-      const safePrice =
-        Number(p.price || 0)
-          .toFixed(2);
-
-
-      return `
-
+    return `
 <div class="col-12 col-sm-6 col-md-4" id="product-${safeCode}">
-
 <div class="card product-card h-100">
-
-
-<img
-
-src="${safeImage}"
-
-class="product-img"
-
-alt="${safeName}"
-
-loading="eager"
-
-decoding="async"
-
-fetchpriority="high"
-
-onclick="showImage('${escapeJs(image)}')"
-
-onerror="imageError(this)">
-
-
+<div class="position-relative">
+<img src="${safeImage}" class="product-img" alt="${safeName}" loading="eager" decoding="async" fetchpriority="high" onclick="openDetail('${escapeJs(p.code)}')" onerror="imageError(this)">
+${photoCount > 1 ? `<span class="badge bg-dark photo-count"><i class="fas fa-images me-1"></i>${photoCount}</span>` : ""}
+</div>
 <div class="card-body d-flex flex-column">
-
-
 <div>
-
 <div class="d-flex justify-content-between mb-2">
-
-<span class="badge bg-dark">
-
-Things No:
-${safeCode}
-
-</span>
-
-
-<span class="badge ${
-  p.stock
-  ? "bg-success"
-  : "bg-danger"
-}">
-
-${
-  p.stock
-  ? "In Stock"
-  : "No Stock"
-}
-
-</span>
-
+<span class="badge bg-dark">Things No: ${safeCode}</span>
+<span class="badge ${p.stock ? "bg-success" : "bg-danger"}">${p.stock ? "In Stock" : "No Stock"}</span>
 </div>
-
-
-<h5 class="fw-bold">
-
-${safeName}
-
-</h5>
-
-
-<h4 class="text-primary fw-bold">
-
-Rs.
-${safePrice}
-
-<small class="text-muted">
-/ item
-</small>
-
-</h4>
-
-
-${
-p.video
-?
-
-`
-
-<button
-
-class="btn btn-outline-danger w-100 mt-2"
-
-onclick="playVideo(
-
-'${escapeJs(p.video)}',
-
-'${escapeJs(p.name)}'
-
-)">
-
-<i class="fas fa-play-circle me-1"></i>
-
-Watch Video
-
-</button>
-
-`
-
-:
-
-""
-
-}
-
+<h5 class="fw-bold mb-1">${safeName}</h5>
+<div class="mb-1"><span class="badge bg-light text-secondary border"><i class="fas fa-tag me-1"></i>${escapeHtml(catLabel(p))}</span></div>
+<h4 class="text-primary fw-bold">Rs. ${safePrice} <small class="text-muted">/ item</small></h4>
+${p.description ? `<p class="text-muted small mb-2 desc-clamp" onclick="openDetail('${escapeJs(p.code)}')" style="cursor:pointer">${escapeHtml(p.description)}</p>` : ""}
+${p.video ? `
+<button class="btn btn-outline-danger w-100 mt-2" onclick="playVideo('${escapeJs(p.video)}','${escapeJs(p.name)}')">
+<i class="fas fa-play-circle me-1"></i> Watch Video
+</button>` : ""}
 </div>
-
-
 <div class="mt-auto">
-
-
-${
-isAdminLoggedIn
-
-?
-
-`
-
+${isAdminLoggedIn ? `
+${costLine(p)}
 <div class="btn-group w-100 mt-3">
-
-<button
-
-class="btn btn-warning"
-
-onclick="editProduct(
-'${escapeJs(p.code)}'
-)">
-
-<i class="fas fa-edit"></i>
-
-Edit
-
-</button>
-
-
-<button
-
-class="btn btn-danger"
-
-onclick="deleteProduct(
-'${escapeJs(p.code)}',
-'${escapeJs(p.name)}'
-)">
-
-<i class="fas fa-trash"></i>
-
-Delete
-
-</button>
-
-</div>
-
-`
-
-:
-
-""
-
-}
-
-
+<button class="btn btn-warning" onclick="editProduct('${escapeJs(p.code)}')"><i class="fas fa-edit"></i> Edit</button>
+<button class="btn btn-danger" onclick="deleteProduct('${escapeJs(p.code)}','${escapeJs(p.name)}')"><i class="fas fa-trash"></i> Delete</button>
+</div>` : ""}
 <div class="d-flex gap-2 mt-2">
-
-<button
-
-class="btn btn-success flex-fill"
-
-${
-!p.stock
-? "disabled"
-: ""
-}
-
-onclick="orderWhatsApp(
-
-'${escapeJs(p.code)}',
-
-'${escapeJs(p.name)}',
-
-'${escapeJs(p.price)}'
-
-)">
-
-<i class="fab fa-whatsapp me-1"></i>
-
-${
-p.stock
-? "Order"
-: "Out of Stock"
-}
-
+<button class="btn btn-success flex-fill" ${!p.stock ? "disabled" : ""} onclick="orderWhatsApp('${escapeJs(p.code)}','${escapeJs(p.name)}','${escapeJs(p.price)}')">
+<i class="fab fa-whatsapp me-1"></i> ${p.stock ? "Order" : "Out of Stock"}
 </button>
-
-
-<button
-
-class="btn btn-outline-primary"
-
-onclick="shareProduct(
-
-'${escapeJs(p.code)}',
-
-'${escapeJs(p.name)}',
-
-'${escapeJs(p.price)}',
-
-'${escapeJs(image)}'
-
-)"
-
-title="Share Product">
-
-<i class="fas fa-share-alt me-1"></i>
-
-Share
-
+<button class="btn btn-outline-primary" onclick="shareProduct('${escapeJs(p.code)}','${escapeJs(p.name)}','${escapeJs(p.price)}','${escapeJs(image)}')" title="Share Product">
+<i class="fas fa-share-alt me-1"></i> Share
 </button>
-
 </div>
-
-
 </div>
-
 </div>
-
 </div>
+</div>`;
+  }).join("");
 
-</div>
-
-`;
-
-    }).join("");
-
-
-  /* CHECK URL AND AUTO SCROLL TO PRODUCT */
   checkUrlAndScroll();
-
 }
 
-
-/* =========================================================
-CHECK URL AND SCROLL TO PRODUCT (RETRY & CASE-INSENSITIVE)
-========================================================= */
-
+/* URL SCROLL */
 function checkUrlAndScroll() {
-
   if (hasScrolledToUrlProduct) return;
-
   const urlParams = new URLSearchParams(window.location.search);
-
   let codeParam = urlParams.get('code') || urlParams.get('item') || window.location.hash.replace('#', '');
-
   if (!codeParam) return;
-
   codeParam = decodeURIComponent(codeParam).trim().toLowerCase();
 
-  const foundProduct = products.find(function(p) {
+  const foundProduct = products.find(function (p) {
     return String(p.code || "").trim().toLowerCase() === codeParam;
   });
 
   if (!foundProduct) {
-    if (scrollAttempts < 15) {
-      scrollAttempts++;
-      setTimeout(checkUrlAndScroll, 300);
-    }
+    if (scrollAttempts < 15) { scrollAttempts++; setTimeout(checkUrlAndScroll, 300); }
     return;
   }
 
-  const exactCode = String(foundProduct.code);
-
-  const targetElement = document.getElementById("product-" + exactCode);
+  const targetElement = document.getElementById("product-" + String(foundProduct.code));
 
   if (targetElement) {
-
     hasScrolledToUrlProduct = true;
-
-    setTimeout(function() {
-
+    setTimeout(function () {
       targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
-
       targetElement.classList.add("highlight-product");
-
-      setTimeout(function() {
-
-        targetElement.classList.remove("highlight-product");
-
-      }, 3500);
-
+      setTimeout(function () { targetElement.classList.remove("highlight-product"); }, 3500);
     }, 300);
-
   } else if (scrollAttempts < 15) {
-
     scrollAttempts++;
-
     setTimeout(checkUrlAndScroll, 300);
-
   }
-
 }
-
-
-/* =========================================================
-IMAGE ERROR
-========================================================= */
 
 function imageError(img) {
-
-  if (
-    img.dataset.failed
-  ) {
-
-    return;
-
-  }
-
-
-  img.dataset.failed =
-    "true";
-
-
-  img.src =
-    "https://via.placeholder.com/600x400?text=Image+Not+Found";
-
+  if (img.dataset.failed) return;
+  img.dataset.failed = "true";
+  img.src = "https://via.placeholder.com/600x400?text=Image+Not+Found";
 }
 
-
-/* =========================================================
-ADMIN LOGIN
-========================================================= */
-
+/* ADMIN LOGIN */
 async function toggleAdminLogin() {
-
   if (isAdminLoggedIn) {
-
-    document
-      .getElementById("adminPanel")
-      .classList.toggle("d-none");
-
+    document.getElementById("adminPanel").classList.toggle("d-none");
     return;
-
   }
-
-
-  const username =
-    prompt(
-      "Enter Admin Username:"
-    );
-
-
+  const username = prompt("Enter Admin Username:");
   if (!username) return;
-
-
-  const password =
-    prompt(
-      "Enter Admin Password:"
-    );
-
-
+  const password = prompt("Enter Admin Password:");
   if (!password) return;
-
-
-  await verifyAdminSession(
-    username,
-    password
-  );
-
+  await verifyAdminSession(username, password);
 }
 
-
-/* =========================================================
-VERIFY ADMIN
-========================================================= */
-
-async function verifyAdminSession(
-  username,
-  password
-) {
-
+async function verifyAdminSession(username, password) {
   try {
-
-    const response =
-      await fetch(
-        APPS_SCRIPT_URL,
-        {
-
-          method:"POST",
-
-          body:
-            JSON.stringify({
-
-              action:
-                "checkLogin",
-
-              username:
-                username,
-
-              password:
-                password
-
-            })
-
-        }
-      );
-
-
-    const result =
-      await response.json();
-
-
-    if (
-      result.status ===
-      "success"
-    ) {
-
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "checkLogin", username: username, password: password })
+    });
+    const result = await response.json();
+    if (result.status === "success") {
+      localStorage.setItem("Sd_admin_token", result.token || "");
       setAdminState(true);
-
-
-      alert(
-        "Admin Login successful!"
-      );
-
+      alert("Admin Login successful!");
     } else {
-
-      alert(
-        result.message ||
-        "Invalid login"
-      );
-
+      alert(result.message || "Invalid login");
     }
-
-  } catch(error) {
-
-    alert(
-      "Login error:\n" +
-      error.message
-    );
-
+  } catch (error) {
+    alert("Login error:\n" + error.message);
   }
-
 }
 
-
-/* =========================================================
-ADMIN STATE
-========================================================= */
-
-function setAdminState(
-  loggedIn
-) {
-
-  isAdminLoggedIn =
-    loggedIn;
-
-
-  const panel =
-    document.getElementById(
-      "adminPanel"
-    );
-
-
-  const button =
-    document.getElementById(
-      "adminAuthBtn"
-    );
-
+function setAdminState(loggedIn) {
+  isAdminLoggedIn = loggedIn;
+  const panel = document.getElementById("adminPanel");
+  const button = document.getElementById("adminAuthBtn");
 
   if (loggedIn) {
-
-    localStorage.setItem(
-      "Sd_admin_auth",
-      "true"
-    );
-
-
-    panel.classList.remove(
-      "d-none"
-    );
-
-
-    button.className =
-      "btn btn-warning btn-sm";
-
-
-    button.innerHTML =
-      '<i class="fas fa-user-cog me-1"></i> Dashboard';
-
+    localStorage.setItem("Sd_admin_auth", "true");
+    panel.classList.remove("d-none");
+    button.className = "btn btn-warning btn-sm";
+    button.innerHTML = '<i class="fas fa-user-cog me-1"></i> Dashboard';
+    loadAdminCosts();
   } else {
-
-    localStorage.removeItem(
-      "Sd_admin_auth"
-    );
-
-
-    panel.classList.add(
-      "d-none"
-    );
-
-
-    button.className =
-      "btn btn-outline-light btn-sm";
-
-
-    button.innerHTML =
-      '<i class="fas fa-lock me-1"></i> Admin';
-
+    localStorage.removeItem("Sd_admin_auth");
+    localStorage.removeItem("Sd_admin_token");
+    adminCosts = {};
+    panel.classList.add("d-none");
+    button.className = "btn btn-outline-light btn-sm d-none";
+    button.innerHTML = '<i class="fas fa-lock me-1"></i> Admin';
   }
-
-
   renderProducts();
-
 }
-
-
-/* =========================================================
-LOGOUT
-========================================================= */
 
 function logoutAdmin() {
-
   setAdminState(false);
-
   resetForm();
-
 }
 
+/* ===== IMAGES (up to 5 per product) ===== */
+const MAX_IMAGES = 5;
+let imageSlots = [null, null, null, null, null];
+const imageCache = {};
 
-/* =========================================================
-FILE TO BASE64
-========================================================= */
+function compressImage(file, maxSide, quality) {
+  return new Promise(function (resolve, reject) {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = function () {
+      let w = img.naturalWidth, h = img.naturalHeight;
+      const s = Math.min(1, maxSide / Math.max(w, h));
+      w = Math.round(w * s); h = Math.round(h * s);
+      const c = document.createElement("canvas");
+      c.width = w; c.height = h;
+      const ctx = c.getContext("2d");
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL("image/jpeg", quality));
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); reject(new Error("Image load failed")); };
+    img.src = url;
+  });
+}
 
-function fileToBase64(file) {
-
-  return new Promise(
-    function(resolve,reject) {
-
-      const reader =
-        new FileReader();
-
-
-      reader.onload =
-        function() {
-
-          resolve(
-            reader.result
-          );
-
-        };
-
-
-      reader.onerror =
-        reject;
-
-
-      reader.readAsDataURL(
-        file
-      );
-
+function renderSlots() {
+  const box = document.getElementById("imageSlots");
+  if (!box) return;
+  box.innerHTML = imageSlots.map(function (s, i) {
+    const tag = '<span class="slot-tag">' + (i === 0 ? "Main" : (i + 1)) + '</span>';
+    let inner;
+    if (s) {
+      inner = (s.preview
+        ? '<img class="slot-img" src="' + escapeHtml(s.preview) + '" alt="">'
+        : '<i class="fas fa-spinner fa-spin text-muted"></i>') +
+        '<button type="button" class="slot-remove" onclick="removeSlot(' + i + ')">&times;</button>';
+    } else {
+      inner = '<label class="slot-add"><i class="fas fa-plus fa-lg"></i><small>Add</small>' +
+        '<input type="file" accept="image/*" multiple hidden onchange="pickImages(this)"></label>';
     }
-  );
-
+    return '<div class="col-4 col-md"><div class="slot-box ' + (s ? "filled" : "") + '">' + inner + tag + '</div></div>';
+  }).join("");
 }
 
-
-/* =========================================================
-IMAGE PREVIEW
-========================================================= */
-
-function previewSelectedImage(event) {
-
-  const file =
-    event.target.files[0];
-
-
-  if (!file) return;
-
-
-  const preview =
-    document.getElementById(
-      "imagePreview"
-    );
-
-
-  const box =
-    document.getElementById(
-      "imagePreviewBox"
-    );
-
-
-  document.getElementById(
-    "imageFileName"
-  ).textContent =
-    file.name;
-
-
-  preview.src =
-    URL.createObjectURL(
-      file
-    );
-
-
-  box.classList.remove(
-    "d-none"
-  );
-
+async function pickImages(input) {
+  const files = Array.from(input.files || []);
+  input.value = "";
+  for (const file of files) {
+    const idx = imageSlots.findIndex(function (s) { return s === null; });
+    if (idx === -1) { alert("Maximum " + MAX_IMAGES + " images allowed."); break; }
+    try {
+      const dataUrl = await compressImage(file, 1280, 0.82);
+      imageSlots[idx] = { file: dataUrl, preview: dataUrl };
+      renderSlots();
+    } catch (e) {
+      alert("Could not read image: " + file.name);
+    }
+  }
 }
 
+function removeSlot(i) {
+  imageSlots[i] = null;
+  renderSlots();
+}
 
-/* =========================================================
-VIDEO PREVIEW
-========================================================= */
+async function fetchImageData(url) {
+  if (!url) return "";
+  if (url.indexOf("data:image/") === 0) return url;
+  if (imageCache[url]) return imageCache[url];
+  const r = await fetch(APPS_SCRIPT_URL + "?action=image&url=" + encodeURIComponent(url), { cache: "no-store" });
+  const j = await r.json();
+  if (j.status !== "success") throw new Error(j.message || "Image load failed");
+  imageCache[url] = j.data;
+  return j.data;
+}
 
 function previewSelectedVideo(event) {
-
-  const file =
-    event.target.files[0];
-
-
+  const file = event.target.files[0];
   if (!file) return;
-
-
-  const preview =
-    document.getElementById(
-      "videoPreview"
-    );
-
-
-  const box =
-    document.getElementById(
-      "videoPreviewBox"
-    );
-
-
-  document.getElementById(
-    "videoFileName"
-  ).textContent =
-    file.name;
-
-
-  preview.src =
-    URL.createObjectURL(
-      file
-    );
-
-
-  box.classList.remove(
-    "d-none"
-  );
-
+  document.getElementById("videoFileName").textContent = file.name;
+  document.getElementById("videoPreview").src = URL.createObjectURL(file);
+  document.getElementById("videoPreviewBox").classList.remove("d-none");
 }
 
+function fileToBase64(file) {
+  return new Promise(function (resolve, reject) {
+    const reader = new FileReader();
+    reader.onload = function () { resolve(reader.result); };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
-/* =========================================================
-SAVE / UPDATE
-========================================================= */
+/* SAVE / UPDATE */
+/* suggested next code (Sd05 -> Sd06); works with both old and new Apps Script */
+function nextLocalCode_() {
+  let max = 0;
+  (products || []).forEach(function (p) {
+    const m = String(p.code).trim().match(/(\d+)\s*$/);
+    if (m) max = Math.max(max, parseInt(m[1], 10));
+  });
+  const n = max + 1;
+  return "Sd" + (n < 10 ? "0" + n : String(n));
+}
 
 async function handleFormSubmit(event) {
-
   event.preventDefault();
+  if (isSaving) return;
 
-
-  const saveBtn =
-    document.getElementById(
-      "saveBtn"
-    );
-
-
-  const oldText =
-    saveBtn.innerHTML;
-
-
-  saveBtn.disabled =
-    true;
-
-
-  saveBtn.innerHTML =
-    '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
-
+  const saveBtn = document.getElementById("saveBtn");
+  const oldText = saveBtn.innerHTML;
+  isSaving = true;
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
 
   try {
+    const videoFile = document.getElementById("thingsVideoFile").files[0];
+    const code = isEditing ? editingCode : nextLocalCode_();   // new product: send a suggested code (new script ignores it and makes its own; old script needs it)
 
-    const imageFile =
-      document.getElementById(
-        "thingsImageFile"
-      ).files[0];
-
-
-    const videoFile =
-      document.getElementById(
-        "thingsVideoFile"
-      ).files[0];
-
-
-    let image =
-      document.getElementById(
-        "existingImage"
-      ).value || "";
-
-
-    let video =
-      document.getElementById(
-        "existingVideo"
-      ).value || "";
-
+    const images = imageSlots.filter(Boolean).map(function (s, i) {
+      return s.file
+        ? { base64: s.file, mime: "image/jpeg" }   /* file name is chosen by the server using the new code */
+        : { url: s.url };
+    });
 
     const payload = {
-
-      action:"save",
-
-      code:
-        document.getElementById(
-          "thingsCode"
-        ).value.trim(),
-
-      name:
-        document.getElementById(
-          "thingsName"
-        ).value.trim(),
-
-      price:
-        document.getElementById(
-          "thingsPrice"
-        ).value,
-
-      stock:
-        document.getElementById(
-          "thingsStock"
-        ).value === "true",
-
-      image:image,
-
-      video:video
-
+      action: "save",
+      mode: isEditing ? "update" : "create",
+      originalCode: isEditing ? editingCode : "",
+      code: code,
+      name: document.getElementById("thingsName").value.trim(),
+      price: document.getElementById("thingsPrice").value,
+      stock: document.getElementById("thingsStock").value === "true",
+      description: document.getElementById("thingsDescription").value.trim(),
+      category: document.getElementById("thingsCategory").value.trim(),
+      costPrice: document.getElementById("thingsCost").value,
+      token: localStorage.getItem("Sd_admin_token") || "",
+      images: images,
+      video: document.getElementById("existingVideo").value || ""
     };
 
-
-    /* IMAGE UPLOAD */
-
-    if (imageFile) {
-
-      payload.imageBase64 =
-        await fileToBase64(
-          imageFile
-        );
-
-
-      payload.imageName =
-        imageFile.name;
-
-
-      payload.imageMime =
-        imageFile.type;
-
-    }
-
-
-    /* VIDEO UPLOAD */
-
     if (videoFile) {
-
-      payload.videoBase64 =
-        await fileToBase64(
-          videoFile
-        );
-
-
-      payload.videoName =
-        videoFile.name;
-
-
-      payload.videoMime =
-        videoFile.type;
-
+      payload.videoBase64 = await fileToBase64(videoFile);
+      payload.videoName = videoFile.name;
+      payload.videoMime = videoFile.type;
     }
 
+    const response = await fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+    const result = await response.json();
+    if (result.code === "AUTH") handleAuthExpired();
+    if (result.status !== "success") throw new Error(result.message || "Save failed");
 
-    const response =
-      await fetch(
-        APPS_SCRIPT_URL,
-        {
-
-          method:"POST",
-
-          body:
-            JSON.stringify(
-              payload
-            )
-
-        }
-      );
-
-
-    const result =
-      await response.json();
-
-
-    if (
-      result.status !==
-      "success"
-    ) {
-
-      throw new Error(
-        result.message ||
-        "Save failed"
-      );
-
-    }
-
-
-    alert(
-      isEditing
-      ? "Product updated successfully!"
-      : "Product saved successfully!"
-    );
-
-
+    alert(isEditing
+      ? "Product " + (result.code || code) + " updated successfully!"
+      : "Product saved successfully!\nCode No: " + (result.code || ""));
     resetForm();
-
-
     await fetchProducts();
-
-
-  } catch(error) {
-
+    loadAdminCosts();
+  } catch (error) {
     console.error(error);
-
-
-    alert(
-      "Save error:\n\n" +
-      error.message
-    );
-
+    alert("Save error:\n\n" + error.message);
   } finally {
-
-    saveBtn.disabled =
-      false;
-
-
-    saveBtn.innerHTML =
-      oldText;
-
+    isSaving = false;
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = oldText;
   }
-
 }
 
-
-/* =========================================================
-EDIT
-========================================================= */
-
+/* EDIT */
 function editProduct(code) {
-
-  const product =
-    products.find(
-      function(p) {
-
-        return String(p.code) ===
-               String(code);
-
-      }
-    );
-
-
+  const product = products.find(function (p) { return String(p.code) === String(code); });
   if (!product) return;
 
+  isEditing = true;
+  editingCode = String(product.code);
+  document.getElementById("thingsCode").value = product.code;
+  document.getElementById("codeCol").classList.remove("d-none");
+  document.getElementById("thingsName").value = product.name;
+  document.getElementById("thingsPrice").value = product.price;
+  document.getElementById("thingsStock").value = product.stock ? "true" : "false";
+  document.getElementById("thingsDescription").value = product.description || "";
+  setCategoryValue(product.category);
+  const c = adminCosts[String(product.code)];
+  document.getElementById("thingsCost").value = (c === undefined || c === null) ? "" : c;
+  updateProfit();
+  document.getElementById("existingVideo").value = product.video || "";
+  document.getElementById("thingsVideoFile").value = "";
 
-  isEditing =
-    true;
-
-
-  document.getElementById(
-    "thingsCode"
-  ).value =
-    product.code;
-
-
-  document.getElementById(
-    "thingsName"
-  ).value =
-    product.name;
-
-
-  document.getElementById(
-    "thingsPrice"
-  ).value =
-    product.price;
-
-
-  document.getElementById(
-    "thingsStock"
-  ).value =
-    product.stock
-    ? "true"
-    : "false";
-
-
-  document.getElementById(
-    "existingImage"
-  ).value =
-    product.image || "";
-
-
-  document.getElementById(
-    "existingVideo"
-  ).value =
-    product.video || "";
-
-
-  document.getElementById(
-    "thingsImageFile"
-  ).value =
-    "";
-
-
-  document.getElementById(
-    "thingsVideoFile"
-  ).value =
-    "";
-
-
-  if (product.image) {
-
-    document.getElementById(
-      "imagePreview"
-    ).src =
-      product.image;
-
-
-    document.getElementById(
-      "imageFileName"
-    ).textContent =
-      "Current Image";
-
-
-    document.getElementById(
-      "imagePreviewBox"
-    ).classList.remove(
-      "d-none"
-    );
-
-  }
-
+  imageSlots = [null, null, null, null, null];
+  const urls = Array.isArray(product.imageUrls) ? product.imageUrls.slice(0, MAX_IMAGES) : [];
+  urls.forEach(function (u, i) {
+    imageSlots[i] = { url: u, preview: (i === 0 && product.image) ? product.image : "" };
+    if (!imageSlots[i].preview) {
+      fetchImageData(u).then(function (d) {
+        if (imageSlots[i] && imageSlots[i].url === u) { imageSlots[i].preview = d; renderSlots(); }
+      }).catch(function () {});
+    }
+  });
+  renderSlots();
 
   if (product.video) {
-
-    document.getElementById(
-      "videoPreview"
-    ).src =
-      product.video;
-
-
-    document.getElementById(
-      "videoFileName"
-    ).textContent =
-      "Current Video";
-
-
-    document.getElementById(
-      "videoPreviewBox"
-    ).classList.remove(
-      "d-none"
-    );
-
+    document.getElementById("videoPreview").src = product.video;
+    document.getElementById("videoFileName").textContent = "Current Video";
+    document.getElementById("videoPreviewBox").classList.remove("d-none");
   }
 
-
-  document.getElementById(
-    "formTitle"
-  ).textContent =
-    "Edit Things No: " +
-    product.code;
-
-
-  document.getElementById(
-    "saveBtn"
-  ).innerHTML =
-    '<i class="fas fa-save me-1"></i> Update Things';
-
-
-  document.getElementById(
-    "cancelEditBtn"
-  ).classList.remove(
-    "d-none"
-  );
-
-
-  document.getElementById(
-    "adminPanel"
-  ).scrollIntoView({
-    behavior:"smooth"
-  });
-
+  document.getElementById("formTitle").textContent = "Edit Things No: " + product.code;
+  document.getElementById("saveBtn").innerHTML = '<i class="fas fa-save me-1"></i> Update Things';
+  document.getElementById("cancelEditBtn").classList.remove("d-none");
+  document.getElementById("adminPanel").scrollIntoView({ behavior: "smooth" });
 }
 
-
-/* =========================================================
-DELETE
-========================================================= */
-
-async function deleteProduct(
-  code,
-  name
-) {
-
-  if (
-    !confirm(
-      'Delete "' +
-      name +
-      '"?'
-    )
-  ) return;
-
-
+/* DELETE */
+async function deleteProduct(code, name) {
+  if (!confirm('Delete "' + name + '"?')) return;
   try {
-
-    const response =
-      await fetch(
-        APPS_SCRIPT_URL,
-        {
-
-          method:"POST",
-
-          body:
-            JSON.stringify({
-
-              action:"delete",
-
-              code:code
-
-            })
-
-        }
-      );
-
-
-    const result =
-      await response.json();
-
-
-    if (
-      result.status !==
-      "success"
-    ) {
-
-      throw new Error(
-        result.message ||
-        "Delete failed"
-      );
-
-    }
-
-
-    alert(
-      "Product deleted successfully!"
-    );
-
-
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "delete", code: code, token: localStorage.getItem("Sd_admin_token") || "" })
+    });
+    const result = await response.json();
+    if (result.code === "AUTH") handleAuthExpired();
+    if (result.status !== "success") throw new Error(result.message || "Delete failed");
+    if (isEditing && editingCode === String(code)) resetForm();
+    alert("Product deleted. Its images and video were removed from Google Drive.");
     await fetchProducts();
-
-
-  } catch(error) {
-
-    alert(
-      "Delete error:\n" +
-      error.message
-    );
-
+  } catch (error) {
+    alert("Delete error:\n" + error.message);
   }
-
 }
 
-
-/* =========================================================
-RESET FORM
-========================================================= */
-
+/* RESET FORM */
 function resetForm() {
-
-  isEditing =
-    false;
-
-
-  document.getElementById(
-    "thingsForm"
-  ).reset();
-
-
-  document.getElementById(
-    "existingImage"
-  ).value =
-    "";
-
-
-  document.getElementById(
-    "existingVideo"
-  ).value =
-    "";
-
-
-  document.getElementById(
-    "imagePreviewBox"
-  ).classList.add(
-    "d-none"
-  );
-
-
-  document.getElementById(
-    "videoPreviewBox"
-  ).classList.add(
-    "d-none"
-  );
-
-
-  document.getElementById(
-    "imagePreview"
-  ).src =
-    "";
-
-
-  document.getElementById(
-    "videoPreview"
-  ).src =
-    "";
-
-
-  document.getElementById(
-    "formTitle"
-  ).textContent =
-    "Add New Things";
-
-
-  document.getElementById(
-    "saveBtn"
-  ).innerHTML =
-    '<i class="fas fa-save me-1"></i> Save Things';
-
-
-  document.getElementById(
-    "cancelEditBtn"
-  ).classList.add(
-    "d-none"
-  );
-
+  isEditing = false;
+  editingCode = "";
+  document.getElementById("thingsForm").reset();
+  document.getElementById("existingVideo").value = "";
+  document.getElementById("videoPreviewBox").classList.add("d-none");
+  document.getElementById("videoPreview").src = "";
+  imageSlots = [null, null, null, null, null];
+  renderSlots();
+  document.getElementById("formTitle").textContent = "Add New Things";
+  document.getElementById("saveBtn").innerHTML = '<i class="fas fa-save me-1"></i> Save Things';
+  document.getElementById("cancelEditBtn").classList.add("d-none");
+  document.getElementById("codeCol").classList.add("d-none");
+  updateProfit();
 }
 
+/* PRODUCT DETAIL (gallery + description) */
+let galleryData = [];
+let galleryIdx = 0;
+let galleryToken = 0;
 
-/* =========================================================
-IMAGE MODAL
-========================================================= */
+function renderGallery() {
+  const main = document.getElementById("galleryMain");
+  const load = document.getElementById("galleryLoading");
+  const cur = galleryData[galleryIdx];
+  if (cur) {
+    main.src = cur;
+    main.classList.remove("d-none");
+    load.classList.add("d-none");
+  } else {
+    main.classList.add("d-none");
+    load.classList.remove("d-none");
+  }
+  document.getElementById("galleryThumbs").innerHTML = galleryData.length > 1
+    ? galleryData.map(function (d, i) {
+        return '<div class="g-thumb ' + (i === galleryIdx ? "active" : "") + '" onclick="selectGallery(' + i + ')">' +
+          (d ? '<img src="' + escapeHtml(d) + '" alt="">' : '<i class="fas fa-spinner fa-spin text-muted"></i>') + '</div>';
+      }).join("")
+    : "";
+}
 
-function showImage(src) {
+function selectGallery(i) {
+  galleryIdx = i;
+  renderGallery();
+}
 
+function openDetail(code) {
+  const p = products.find(function (x) { return String(x.code) === String(code); });
+  if (!p) return;
+
+  const urls = (p.imageUrls && p.imageUrls.length) ? p.imageUrls : [];
+  const n = Math.max(urls.length, 1);
+  const token = ++galleryToken;
+
+  galleryData = new Array(n).fill("");
+  galleryData[0] = p.image || "";
+  galleryIdx = 0;
+
+  document.getElementById("detailTitle").textContent = p.name;
+  document.getElementById("detailPrice").textContent = "Rs. " + Number(p.price || 0).toFixed(2);
+  const st = document.getElementById("detailStock");
+  st.textContent = p.stock ? "In Stock" : "No Stock";
+  st.className = "badge " + (p.stock ? "bg-success" : "bg-danger");
+  document.getElementById("detailDesc").textContent = p.description || "";
+
+  renderGallery();
+  bootstrap.Modal.getOrCreateInstance(document.getElementById("detailModal")).show();
+
+  for (let i = 1; i < n; i++) {
+    fetchImageData(urls[i]).then(function (d) {
+      if (token !== galleryToken) return;
+      galleryData[i] = d;
+      renderGallery();
+    }).catch(function () {});
+  }
+}
+
+function playVideo(src, title) {
   if (!src) return;
-
-
-  document.getElementById(
-    "modalImage"
-  ).src =
-    src;
-
-
-  bootstrap.Modal
-    .getOrCreateInstance(
-      document.getElementById(
-        "imageModal"
-      )
-    )
-    .show();
-
+  const video = document.getElementById("modalVideo");
+  document.getElementById("videoTitle").textContent = title;
+  video.src = src;
+  bootstrap.Modal.getOrCreateInstance(document.getElementById("videoModal")).show();
+  video.play().catch(function () {});
 }
-
-
-/* =========================================================
-VIDEO
-========================================================= */
-
-function playVideo(
-  src,
-  title
-) {
-
-  if (!src) return;
-
-
-  const video =
-    document.getElementById(
-      "modalVideo"
-    );
-
-
-  document.getElementById(
-    "videoTitle"
-  ).textContent =
-    title;
-
-
-  video.src =
-    src;
-
-
-  bootstrap.Modal
-    .getOrCreateInstance(
-      document.getElementById(
-        "videoModal"
-      )
-    )
-    .show();
-
-
-  video.play()
-    .catch(function(){});
-
-}
-
-
-/* =========================================================
-STOP VIDEO
-========================================================= */
 
 function stopVideo() {
-
-  const video =
-    document.getElementById(
-      "modalVideo"
-    );
-
-
+  const video = document.getElementById("modalVideo");
   video.pause();
-
-  video.removeAttribute(
-    "src"
-  );
-
+  video.removeAttribute("src");
   video.load();
-
 }
 
-
-/* =========================================================
-WHATSAPP
-========================================================= */
-
-function orderWhatsApp(
-  code,
-  name,
-  price
-) {
-
+/* WHATSAPP ORDER */
+function orderWhatsApp(code, name, price) {
   const message =
     "Hello,\n\n" +
-
-    "Things No: " +
-    code +
-
-    "\n" +
-
-    "Things: " +
-    name +
-
-    "\n" +
-
-    "Price: Rs. " +
-    price +
-    " / item\n\n" +
-
+    "Things No: " + code + "\n" +
+    "Things: " + name + "\n" +
+    "Price: Rs. " + price + " / item\n\n" +
     "Please confirm availability.";
-
-
-  window.open(
-
-    "https://wa.me/94704599366?text=" +
-
-    encodeURIComponent(
-      message
-    ),
-
-    "_blank"
-
-  );
-
+  window.open("https://wa.me/94704599366?text=" + encodeURIComponent(message), "_blank");
 }
 
-
-/* =========================================================
-SHARE PRODUCT WITH IMAGE AND CUSTOM DIRECT PRODUCT LINK
-========================================================= */
-
-async function shareProduct(
-  code,
-  name,
-  price,
-  imageUrl
-) {
-
+/* SHARE */
+async function shareProduct(code, name, price, imageUrl) {
   const productUrl = "https://mrfs1805-lab.github.io/Sd-Selection/?code=" + encodeURIComponent(code);
 
   const shareText =
     "🛍️ *" + name + "*\n" +
     "📌 Things No: " + code + "\n" +
     "💰 Price: Rs. " + price + "\n\n" +
-  
     "Sd Selection (0704599366)\n" +
     "👇 Check out this product on our website:\n" +
     productUrl;
@@ -2757,118 +1114,61 @@ async function shareProduct(
   let filesArray = [];
 
   if (imageUrl) {
-
     try {
-
       const response = await fetch(imageUrl);
-
       const blob = await response.blob();
-
-      const file = new File(
-        [blob],
-        code + ".jpg",
-        { type: blob.type || "image/jpeg" }
-      );
-
-      filesArray = [file];
-
+      filesArray = [new File([blob], code + ".jpg", { type: blob.type || "image/jpeg" })];
     } catch (error) {
-
       console.warn("Image fetch error:", error);
-
     }
-
   }
-
 
   if (navigator.share) {
-
-    const shareData = {
-      title: name,
-      text: shareText
-    };
-
-
-    if (
-      filesArray.length > 0 &&
-      navigator.canShare &&
-      navigator.canShare({ files: filesArray })
-    ) {
-
+    const shareData = { title: name, text: shareText };
+    if (filesArray.length > 0 && navigator.canShare && navigator.canShare({ files: filesArray })) {
       shareData.files = filesArray;
-
     }
-
-
     try {
-
       await navigator.share(shareData);
-
     } catch (error) {
-
       console.log("Sharing canceled or failed:", error);
-
     }
-
   } else {
-
-    const whatsappShareUrl =
-      "https://api.whatsapp.com/send?text=" +
-      encodeURIComponent(shareText);
-
-    window.open(whatsappShareUrl, "_blank");
-
+    window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(shareText), "_blank");
   }
-
 }
 
+/* FILTER EVENTS */
+searchInput.addEventListener("input", renderProducts);
+sortBy.addEventListener("change", renderProducts);
+filterStock.addEventListener("change", renderProducts);
 
-/* =========================================================
-FILTER EVENTS
-========================================================= */
-
-searchInput.addEventListener(
-  "input",
-  renderProducts
-);
-
-
-sortBy.addEventListener(
-  "change",
-  renderProducts
-);
-
-
-filterStock.addEventListener(
-  "change",
-  renderProducts
-);
-
-
-/* =========================================================
-ADMIN SESSION
-========================================================= */
-
-if (
-  localStorage.getItem(
-    "Sd_admin_auth"
-  ) === "true"
-) {
-
+/* ADMIN SESSION */
+if (localStorage.getItem("Sd_admin_auth") === "true") {
   setAdminState(true);
-
 }
 
+/* SECRET 5-TAP ADMIN LOGIN */
+let tapCount = 0;
+let tapTimer;
 
-/* =========================================================
-START
-========================================================= */
+document.getElementById("secretTap").addEventListener("click", function () {
+  tapCount++;
+  clearTimeout(tapTimer);
+  tapTimer = setTimeout(function () { tapCount = 0; }, 1500);
 
+  if (tapCount >= 5) {
+    tapCount = 0;
+    toggleAdminLogin();
+  }
+});
+
+/* START */
+renderSlots();
 loadCachedProducts();
-
 fetchProducts();
 
-  /* PWA INSTALL POPUP SCRIPT */
+/* PWA INSTALL POPUP */
 let deferredPrompt;
 const installPopup = document.getElementById("installPopup");
 const installActionBtn = document.getElementById("installActionBtn");
@@ -2876,14 +1176,12 @@ const iosInstructions = document.getElementById("iosInstructions");
 const installSubtext = document.getElementById("installSubtext");
 
 const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
 
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  if (installPopup) {
-    installPopup.classList.add("show");
-  }
+  if (installPopup) installPopup.classList.add("show");
 });
 
 if (isIos && !isInStandaloneMode) {
@@ -2891,9 +1189,7 @@ if (isIos && !isInStandaloneMode) {
     installSubtext.classList.add("d-none");
     iosInstructions.classList.remove("d-none");
     installActionBtn.classList.add("d-none");
-    setTimeout(() => {
-      installPopup.classList.add("show");
-    }, 2000);
+    setTimeout(() => { installPopup.classList.add("show"); }, 2000);
   }
 }
 
@@ -2901,9 +1197,7 @@ function handleInstallClick() {
   if (deferredPrompt) {
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === "accepted") {
-        console.log("User accepted install");
-      }
+      if (choiceResult.outcome === "accepted") console.log("User accepted install");
       deferredPrompt = null;
       dismissInstallPopup();
     });
@@ -2911,13 +1205,8 @@ function handleInstallClick() {
 }
 
 function dismissInstallPopup() {
-  if (installPopup) {
-    installPopup.classList.remove("show");
-  }
+  if (installPopup) installPopup.classList.remove("show");
 }
-
 </script>
-
 </body>
-
 </html>
