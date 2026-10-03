@@ -919,16 +919,23 @@ async function handleFormSubmit(event) {
       ? "Product " + (result.code || code) + " updated successfully!"
       : "Product saved successfully!\nCode No: " + (result.code || ""));
     resetForm();
-    await fetchProducts();
+    unlockSaveBtn_();   /* unlock right away - do not wait for the list refresh */
+    fetchProducts().catch(function (e) { console.error(e); });
     loadAdminCosts();
   } catch (error) {
     console.error(error);
     alert("Save error:\n\n" + error.message);
+    saveBtn.innerHTML = oldText;   /* keep Save / Update label on failure */
   } finally {
     isSaving = false;
     saveBtn.disabled = false;
-    saveBtn.innerHTML = oldText;
   }
+}
+
+function unlockSaveBtn_() {
+  isSaving = false;
+  const b = document.getElementById("saveBtn");
+  if (b) b.disabled = false;
 }
 
 /* EDIT */
@@ -936,6 +943,7 @@ function editProduct(code) {
   const product = products.find(function (p) { return String(p.code) === String(code); });
   if (!product) return;
 
+  unlockSaveBtn_();
   isEditing = true;
   editingCode = String(product.code);
   document.getElementById("thingsCode").value = product.code;
@@ -998,6 +1006,7 @@ async function deleteProduct(code, name) {
 function resetForm() {
   isEditing = false;
   editingCode = "";
+  unlockSaveBtn_();
   document.getElementById("thingsForm").reset();
   document.getElementById("existingVideo").value = "";
   document.getElementById("videoPreviewBox").classList.add("d-none");
