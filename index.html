@@ -61,6 +61,9 @@ body{background:#f8fafc}
 .cat-chip small{opacity:.7;margin-left:4px}
 .cat-chip.active{background:linear-gradient(135deg,#0d6efd,#00b4d8);border-color:transparent;color:#fff}
 #syncStatus{font-size:12px}
+.save-inline{margin-top:16px;border:1px solid #cfe2ff;background:#f8fbff;border-radius:12px;padding:12px;max-height:50vh;overflow:auto}
+.save-item{border-bottom:1px solid #e5e7eb;padding:8px 0;display:flex;align-items:center;gap:10px}
+.save-item:last-child{border-bottom:none}
 @media(max-width:768px){
 .bottom-bar{display:flex;position:fixed;bottom:0;left:0;width:100%;z-index:999}
 body{padding-bottom:60px}
@@ -164,6 +167,15 @@ body{padding-bottom:60px}
 </div>
 </div>
 </form>
+
+<!-- SAVE STATUS (below Save button) -->
+<div id="saveStatusBox" class="save-inline d-none">
+<div class="d-flex justify-content-between align-items-center mb-2">
+<h6 class="fw-bold mb-0"><i class="fas fa-list-check me-1"></i> Save Status <span id="saveSummary" class="badge ms-1"></span></h6>
+<button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearFinishedJobs()">Clear done</button>
+</div>
+<div id="saveList"></div>
+</div>
 </div>
 </div>
 </section>
@@ -336,7 +348,6 @@ let adminCosts = {};
 let serverCategories = [];
 let adminCategoryLabels = [];
 let editingCode = "";
-let isSaving = false;
 let scrollAttempts = 0;
 
 const productsContainer = document.getElementById("products");
@@ -754,6 +765,7 @@ function setAdminState(loggedIn) {
     button.innerHTML = '<i class="fas fa-lock me-1"></i> Admin';
   }
   renderProducts();
+  renderSaveStatus();
 }
 
 function logoutAdmin() {
@@ -856,7 +868,6 @@ function fileToBase64(file) {
   });
 }
 
-/* SAVE / UPDATE */
 /* suggested next code (Sd05 -> Sd06); works with both old and new Apps Script */
 function nextLocalCode_() {
   let max = 0;
@@ -868,82 +879,159 @@ function nextLocalCode_() {
   return "Sd" + (n < 10 ? "0" + n : String(n));
 }
 
-async function handleFormSubmit(event) {
+/* ===== BACKGROUND SAVE QUEUE ===== */
+let saveJobs = [];
+let jobSeq = 0;
+let queueRunning = false;
+
+function handleFormSubmit(event) {
   event.preventDefault();
-  if (isSaving) return;
 
-  const saveBtn = document.getElementById("saveBtn");
-  const oldText = saveBtn.innerHTML;
-  isSaving = true;
-  saveBtn.disabled = true;
-  saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
-
-  try {
-    const videoFile = document.getElementById("thingsVideoFile").files[0];
-    const code = isEditing ? editingCode : nextLocalCode_();   // new product: send a suggested code (new script ignores it and makes its own; old script needs it)
-
-    const images = imageSlots.filter(Boolean).map(function (s, i) {
-      return s.file
-        ? { base64: s.file, mime: "image/jpeg" }   /* file name is chosen by the server using the new code */
-        : { url: s.url };
-    });
-
-    const payload = {
+  const job = {
+    id: ++jobSeq,
+    mode: isEditing ? "update" : "create",
+    originalCode: isEditing ? editingCode : "",
+    name: document.getElementById("thingsName").value.trim(),
+    videoFile: document.getElementById("thingsVideoFile").files[0] || null,
+    payload: {
       action: "save",
       mode: isEditing ? "update" : "create",
       originalCode: isEditing ? editingCode : "",
-      code: code,
+      code: isEditing ? editingCode : "",
       name: document.getElementById("thingsName").value.trim(),
       price: document.getElementById("thingsPrice").value,
       stock: document.getElementById("thingsStock").value === "true",
       description: document.getElementById("thingsDescription").value.trim(),
       category: document.getElementById("thingsCategory").value.trim(),
       costPrice: document.getElementById("thingsCost").value,
-      token: localStorage.getItem("Sd_admin_token") || "",
-      images: images,
+      images: imageSlots.filter(Boolean).map(function (s) {
+        return s.file ? { base64: s.file, mime: "image/jpeg" } : { url: s.url };
+      }),
       video: document.getElementById("existingVideo").value || ""
-    };
+    },
+    status: "queued",
+    message: "",
+    code: ""
+  };
 
-    if (videoFile) {
-      payload.videoBase64 = await fileToBase64(videoFile);
-      payload.videoName = videoFile.name;
-      payload.videoMime = videoFile.type;
+  saveJobs.push(job);
+  resetForm();                 // form clears immediately
+  renderSaveStatus();
+  processQueue();
+}
+
+async function processQueue() {
+  if (queueRunning) return;
+  queueRunning = true;
+  try {
+    let job;
+    while ((job = saveJobs.find(function (j) { return j.status === "queued"; }))) {
+      await runJob(job);
+    }
+  } finally {
+    queueRunning = false;
+  }
+}
+
+async function runJob(job) {
+  job.status = "saving";
+  job.message = "Uploading...";
+  renderSaveStatus();
+  try {
+    const payload = Object.assign({}, job.payload);
+    payload.token = localStorage.getItem("Sd_admin_token") || "";
+    if (job.mode === "create") payload.code = nextLocalCode_();
+
+    if (job.videoFile) {
+      payload.videoBase64 = await fileToBase64(job.videoFile);
+      payload.videoName = job.videoFile.name;
+      payload.videoMime = job.videoFile.type;
     }
 
     const response = await fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
     const result = await response.json();
-    if (result.code === "AUTH") handleAuthExpired();
+    if (result.code === "AUTH") { handleAuthExpired(); throw new Error("Session expired - login again, then Retry"); }
     if (result.status !== "success") throw new Error(result.message || "Save failed");
 
-    alert(isEditing
-      ? "Product " + (result.code || code) + " updated successfully!"
-      : "Product saved successfully!\nCode No: " + (result.code || ""));
-    resetForm();
-    unlockSaveBtn_();   /* unlock right away - do not wait for the list refresh */
-    fetchProducts().catch(function (e) { console.error(e); });
+    job.status = "done";
+    job.code = result.code || payload.code;
+    job.message = "Saved - Code: " + job.code;
+    job.videoFile = null;       // free memory
+    renderSaveStatus();
+    await fetchProducts();      // so the next code is correct
     loadAdminCosts();
   } catch (error) {
     console.error(error);
-    alert("Save error:\n\n" + error.message);
-    saveBtn.innerHTML = oldText;   /* keep Save / Update label on failure */
-  } finally {
-    isSaving = false;
-    saveBtn.disabled = false;
+    job.status = "error";
+    job.message = error.message || "Failed";
+    renderSaveStatus();
   }
 }
 
-function unlockSaveBtn_() {
-  isSaving = false;
-  const b = document.getElementById("saveBtn");
-  if (b) b.disabled = false;
+function retryJob(id) {
+  const j = saveJobs.find(function (x) { return x.id === id; });
+  if (!j) return;
+  j.status = "queued";
+  j.message = "";
+  renderSaveStatus();
+  processQueue();
 }
+
+function removeJob(id) {
+  saveJobs = saveJobs.filter(function (j) { return j.id !== id || j.status === "saving"; });
+  renderSaveStatus();
+}
+
+function clearFinishedJobs() {
+  saveJobs = saveJobs.filter(function (j) { return j.status === "queued" || j.status === "saving" || j.status === "error"; });
+  renderSaveStatus();
+}
+
+function renderSaveStatus() {
+  const box = document.getElementById("saveStatusBox");
+  const summary = document.getElementById("saveSummary");
+  const list = document.getElementById("saveList");
+  if (!box || !list) return;
+
+  const pending = saveJobs.filter(function (j) { return j.status === "queued" || j.status === "saving"; }).length;
+  const failed = saveJobs.filter(function (j) { return j.status === "error"; }).length;
+
+  box.classList.toggle("d-none", saveJobs.length === 0);
+  summary.textContent = failed ? failed + " failed" : pending ? pending + " pending" : "All saved ✓";
+  summary.className = "badge ms-1 " + (failed ? "bg-danger" : pending ? "bg-warning text-dark" : "bg-success");
+
+  list.innerHTML = saveJobs.length ? saveJobs.slice().reverse().map(function (j) {
+    const icon = {
+      queued: '<i class="fas fa-clock text-secondary"></i>',
+      saving: '<i class="fas fa-spinner fa-spin text-primary"></i>',
+      done: '<i class="fas fa-circle-check text-success"></i>',
+      error: '<i class="fas fa-circle-xmark text-danger"></i>'
+    }[j.status];
+    const label = { queued: "Waiting", saving: "Saving...", done: "Done", error: "Failed" }[j.status];
+    const actions =
+      (j.status === "error" ? '<button type="button" class="btn btn-sm btn-warning" onclick="retryJob(' + j.id + ')">Retry</button> ' : "") +
+      (j.status !== "saving" ? '<button type="button" class="btn btn-sm btn-outline-secondary" onclick="removeJob(' + j.id + ')">&times;</button>' : "");
+    return '<div class="save-item"><div class="fs-5">' + icon + '</div>' +
+      '<div class="flex-fill" style="min-width:0"><div class="fw-bold text-truncate">' + escapeHtml(j.name) +
+      ' <small class="text-muted">(' + (j.mode === "create" ? "New" : "Edit " + escapeHtml(j.originalCode)) + ')</small></div>' +
+      '<small class="text-muted">' + label + (j.message ? " - " + escapeHtml(j.message) : "") + '</small></div>' +
+      '<div class="text-nowrap">' + actions + '</div></div>';
+  }).join("") : '<small class="text-muted">No uploads yet.</small>';
+}
+
+/* warn before closing the page while saves are pending */
+window.addEventListener("beforeunload", function (e) {
+  if (saveJobs.some(function (j) { return j.status === "queued" || j.status === "saving"; })) {
+    e.preventDefault();
+    e.returnValue = "";
+  }
+});
 
 /* EDIT */
 function editProduct(code) {
   const product = products.find(function (p) { return String(p.code) === String(code); });
   if (!product) return;
 
-  unlockSaveBtn_();
   isEditing = true;
   editingCode = String(product.code);
   document.getElementById("thingsCode").value = product.code;
@@ -1006,7 +1094,6 @@ async function deleteProduct(code, name) {
 function resetForm() {
   isEditing = false;
   editingCode = "";
-  unlockSaveBtn_();
   document.getElementById("thingsForm").reset();
   document.getElementById("existingVideo").value = "";
   document.getElementById("videoPreviewBox").classList.add("d-none");
