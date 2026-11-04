@@ -151,7 +151,9 @@ body{padding-bottom:60px}
 <div class="col-12">
 <label class="form-label fw-bold"><i class="fas fa-images text-primary me-1"></i> Product Images (max 5)</label>
 <div id="imageSlots" class="row g-2"></div>
-<small class="text-muted">First image is the main photo. Tap + to choose one or many photos.</small>
+<input type="file" id="imagePicker" accept="image/jpeg,image/png,image/webp,image/*" multiple hidden onchange="pickImages(this)">
+<label for="imagePicker" class="btn btn-outline-primary btn-sm mt-2"><i class="fas fa-images me-1"></i> Select photos (up to 5)</label>
+<div><small class="text-muted">First image is the main photo. If your phone lets you pick only one, tap again to add the next one.</small></div>
 </div>
 <div class="col-12">
 <label class="form-label fw-bold"><i class="fas fa-video text-danger me-1"></i> Product Video</label>
@@ -282,6 +284,26 @@ body{padding-bottom:60px}
 <span id="detailStock" class="badge"></span>
 </div>
 <p id="detailDesc" class="mt-2 mb-0" style="white-space:pre-line"></p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- TOTP LOGIN MODAL (stays open until login or X) -->
+<div class="modal fade" id="totpModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content">
+<div class="modal-header py-2">
+<h5 class="modal-title"><i class="fas fa-shield-halved me-2"></i>Admin Login</h5>
+<button type="button" class="btn-close" onclick="closeTotpModal()"></button>
+</div>
+<div class="modal-body">
+<label class="form-label fw-bold">Authenticator Code (6 digits)</label>
+<input type="text" id="totpInput" class="form-control form-control-lg text-center" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••">
+<div id="totpError" class="text-danger small mt-2"></div>
+</div>
+<div class="modal-footer">
+<button type="button" id="totpBtn" class="btn btn-primary w-100" onclick="submitTotp()">Login</button>
 </div>
 </div>
 </div>
@@ -713,36 +735,55 @@ function imageError(img) {
   img.src = "https://via.placeholder.com/600x400?text=Image+Not+Found";
 }
 
-/* ADMIN LOGIN */
-async function toggleAdminLogin() {
+/* ===== ADMIN LOGIN (TOTP ONLY) ===== */
+function toggleAdminLogin() {
   if (isAdminLoggedIn) {
     document.getElementById("adminPanel").classList.toggle("d-none");
     return;
   }
-  const username = prompt("Enter Admin Username:");
-  if (!username) return;
-  const password = prompt("Enter Admin Password:");
-  if (!password) return;
-  await verifyAdminSession(username, password);
+  openTotpModal();
 }
 
-async function verifyAdminSession(username, password) {
+function openTotpModal() {
+  localStorage.setItem("Sd_login_open", "1");   // stays open even if the page reloads
+  document.getElementById("totpError").textContent = "";
+  document.getElementById("totpInput").value = "";
+  bootstrap.Modal.getOrCreateInstance(document.getElementById("totpModal")).show();
+}
+
+function closeTotpModal() {
+  localStorage.removeItem("Sd_login_open");
+  bootstrap.Modal.getOrCreateInstance(document.getElementById("totpModal")).hide();
+}
+
+async function submitTotp() {
+  const err = document.getElementById("totpError");
+  const btn = document.getElementById("totpBtn");
+  const code = document.getElementById("totpInput").value.replace(/\s/g, "");
+  if (!/^\d{6}$/.test(code)) { err.textContent = "Enter the 6 digit code."; return; }
+  btn.disabled = true;
+  err.textContent = "";
   try {
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "checkLogin", username: username, password: password })
-    });
-    const result = await response.json();
-    if (result.status === "success") {
-      localStorage.setItem("Sd_admin_token", result.token || "");
+    const r = await fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "checkLogin", code: code }) });
+    const j = await r.json();
+    if (j.status === "success") {
+      localStorage.setItem("Sd_admin_token", j.token || "");
+      closeTotpModal();
       setAdminState(true);
-      alert("Admin Login successful!");
     } else {
-      alert(result.message || "Invalid login");
+      err.textContent = j.message || "Invalid code";
     }
-  } catch (error) {
-    alert("Login error:\n" + error.message);
+  } catch (e) {
+    err.textContent = "Login error: " + e.message;
+  } finally {
+    btn.disabled = false;
   }
+}
+
+function tokenStillValid_() {
+  const t = localStorage.getItem("Sd_admin_token") || "";
+  const exp = Number(t.split(".")[0]);
+  return !!exp && Date.now() < exp;
 }
 
 function setAdminState(loggedIn) {
@@ -812,8 +853,7 @@ function renderSlots() {
         : '<i class="fas fa-spinner fa-spin text-muted"></i>') +
         '<button type="button" class="slot-remove" onclick="removeSlot(' + i + ')">&times;</button>';
     } else {
-      inner = '<label class="slot-add"><i class="fas fa-plus fa-lg"></i><small>Add</small>' +
-        '<input type="file" accept="image/*" multiple hidden onchange="pickImages(this)"></label>';
+      inner = '<label class="slot-add" for="imagePicker"><i class="fas fa-plus fa-lg"></i><small>Add</small></label>';
     }
     return '<div class="col-4 col-md"><div class="slot-box ' + (s ? "filled" : "") + '">' + inner + tag + '</div></div>';
   }).join("");
@@ -1239,9 +1279,19 @@ searchInput.addEventListener("input", renderProducts);
 sortBy.addEventListener("change", renderProducts);
 filterStock.addEventListener("change", renderProducts);
 
-/* ADMIN SESSION */
+/* ADMIN SESSION (token is valid 7 days) */
 if (localStorage.getItem("Sd_admin_auth") === "true") {
-  setAdminState(true);
+  if (tokenStillValid_()) {
+    setAdminState(true);
+  } else {
+    localStorage.removeItem("Sd_admin_auth");
+    localStorage.removeItem("Sd_admin_token");
+  }
+}
+
+/* If the login box was open before the app was closed/reloaded, open it again */
+if (localStorage.getItem("Sd_login_open") === "1" && !isAdminLoggedIn) {
+  openTotpModal();
 }
 
 /* SECRET 5-TAP ADMIN LOGIN */
